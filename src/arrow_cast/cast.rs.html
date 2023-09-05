@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-cast/src/cast.rs`."><title>cast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-07416f8512e0e04c.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_cast" data-themes="" data-resource-suffix="" data-rustdoc-version="1.73.0-nightly (da6b55cc5 2023-07-17)" data-channel="nightly" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-6d2c9675f3d09c26.css" data-theme-dark-css="dark-45ceb8f2e522f4d1.css" data-theme-ayu-css="ayu-fd19013d6ce078bf.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-6d2c9675f3d09c26.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-45ceb8f2e522f4d1.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../arrow_cast/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-cast/src/cast.rs`."><title>cast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-47e7ab555ef2818a.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_cast" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (ec08a0337 2023-09-04)" data-channel="nightly" data-search-js="search-5d3eaacf19ebf04f.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-f194925aa375ae96.css" data-theme-dark-css="dark-1dd4d1ce031e15de.css" data-theme-ayu-css="ayu-49e58d069f567085.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-ef3a2de404864b0b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-f194925aa375ae96.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1dd4d1ce031e15de.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../arrow_cast/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -8928,113 +8928,6 @@
 <a href="#8928" id="8928">8928</a>
 <a href="#8929" id="8929">8929</a>
 <a href="#8930" id="8930">8930</a>
-<a href="#8931" id="8931">8931</a>
-<a href="#8932" id="8932">8932</a>
-<a href="#8933" id="8933">8933</a>
-<a href="#8934" id="8934">8934</a>
-<a href="#8935" id="8935">8935</a>
-<a href="#8936" id="8936">8936</a>
-<a href="#8937" id="8937">8937</a>
-<a href="#8938" id="8938">8938</a>
-<a href="#8939" id="8939">8939</a>
-<a href="#8940" id="8940">8940</a>
-<a href="#8941" id="8941">8941</a>
-<a href="#8942" id="8942">8942</a>
-<a href="#8943" id="8943">8943</a>
-<a href="#8944" id="8944">8944</a>
-<a href="#8945" id="8945">8945</a>
-<a href="#8946" id="8946">8946</a>
-<a href="#8947" id="8947">8947</a>
-<a href="#8948" id="8948">8948</a>
-<a href="#8949" id="8949">8949</a>
-<a href="#8950" id="8950">8950</a>
-<a href="#8951" id="8951">8951</a>
-<a href="#8952" id="8952">8952</a>
-<a href="#8953" id="8953">8953</a>
-<a href="#8954" id="8954">8954</a>
-<a href="#8955" id="8955">8955</a>
-<a href="#8956" id="8956">8956</a>
-<a href="#8957" id="8957">8957</a>
-<a href="#8958" id="8958">8958</a>
-<a href="#8959" id="8959">8959</a>
-<a href="#8960" id="8960">8960</a>
-<a href="#8961" id="8961">8961</a>
-<a href="#8962" id="8962">8962</a>
-<a href="#8963" id="8963">8963</a>
-<a href="#8964" id="8964">8964</a>
-<a href="#8965" id="8965">8965</a>
-<a href="#8966" id="8966">8966</a>
-<a href="#8967" id="8967">8967</a>
-<a href="#8968" id="8968">8968</a>
-<a href="#8969" id="8969">8969</a>
-<a href="#8970" id="8970">8970</a>
-<a href="#8971" id="8971">8971</a>
-<a href="#8972" id="8972">8972</a>
-<a href="#8973" id="8973">8973</a>
-<a href="#8974" id="8974">8974</a>
-<a href="#8975" id="8975">8975</a>
-<a href="#8976" id="8976">8976</a>
-<a href="#8977" id="8977">8977</a>
-<a href="#8978" id="8978">8978</a>
-<a href="#8979" id="8979">8979</a>
-<a href="#8980" id="8980">8980</a>
-<a href="#8981" id="8981">8981</a>
-<a href="#8982" id="8982">8982</a>
-<a href="#8983" id="8983">8983</a>
-<a href="#8984" id="8984">8984</a>
-<a href="#8985" id="8985">8985</a>
-<a href="#8986" id="8986">8986</a>
-<a href="#8987" id="8987">8987</a>
-<a href="#8988" id="8988">8988</a>
-<a href="#8989" id="8989">8989</a>
-<a href="#8990" id="8990">8990</a>
-<a href="#8991" id="8991">8991</a>
-<a href="#8992" id="8992">8992</a>
-<a href="#8993" id="8993">8993</a>
-<a href="#8994" id="8994">8994</a>
-<a href="#8995" id="8995">8995</a>
-<a href="#8996" id="8996">8996</a>
-<a href="#8997" id="8997">8997</a>
-<a href="#8998" id="8998">8998</a>
-<a href="#8999" id="8999">8999</a>
-<a href="#9000" id="9000">9000</a>
-<a href="#9001" id="9001">9001</a>
-<a href="#9002" id="9002">9002</a>
-<a href="#9003" id="9003">9003</a>
-<a href="#9004" id="9004">9004</a>
-<a href="#9005" id="9005">9005</a>
-<a href="#9006" id="9006">9006</a>
-<a href="#9007" id="9007">9007</a>
-<a href="#9008" id="9008">9008</a>
-<a href="#9009" id="9009">9009</a>
-<a href="#9010" id="9010">9010</a>
-<a href="#9011" id="9011">9011</a>
-<a href="#9012" id="9012">9012</a>
-<a href="#9013" id="9013">9013</a>
-<a href="#9014" id="9014">9014</a>
-<a href="#9015" id="9015">9015</a>
-<a href="#9016" id="9016">9016</a>
-<a href="#9017" id="9017">9017</a>
-<a href="#9018" id="9018">9018</a>
-<a href="#9019" id="9019">9019</a>
-<a href="#9020" id="9020">9020</a>
-<a href="#9021" id="9021">9021</a>
-<a href="#9022" id="9022">9022</a>
-<a href="#9023" id="9023">9023</a>
-<a href="#9024" id="9024">9024</a>
-<a href="#9025" id="9025">9025</a>
-<a href="#9026" id="9026">9026</a>
-<a href="#9027" id="9027">9027</a>
-<a href="#9028" id="9028">9028</a>
-<a href="#9029" id="9029">9029</a>
-<a href="#9030" id="9030">9030</a>
-<a href="#9031" id="9031">9031</a>
-<a href="#9032" id="9032">9032</a>
-<a href="#9033" id="9033">9033</a>
-<a href="#9034" id="9034">9034</a>
-<a href="#9035" id="9035">9035</a>
-<a href="#9036" id="9036">9036</a>
-<a href="#9037" id="9037">9037</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -9078,7 +8971,7 @@
 <span class="kw">use </span>std::cmp::Ordering;
 <span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use </span><span class="kw">crate</span>::display::{array_value_to_string, ArrayFormatter, FormatOptions};
+<span class="kw">use </span><span class="kw">crate</span>::display::{ArrayFormatter, FormatOptions};
 <span class="kw">use </span><span class="kw">crate</span>::parse::{
     parse_interval_day_time, parse_interval_month_day_nano, parse_interval_year_month,
     string_to_datetime, Parser,
@@ -9086,7 +8979,7 @@
 <span class="kw">use </span>arrow_array::{
     builder::<span class="kw-2">*</span>, cast::<span class="kw-2">*</span>, temporal_conversions::<span class="kw-2">*</span>, timezone::Tz, types::<span class="kw-2">*</span>, <span class="kw-2">*</span>,
 };
-<span class="kw">use </span>arrow_buffer::{i256, ArrowNativeType, Buffer, OffsetBuffer, ScalarBuffer};
+<span class="kw">use </span>arrow_buffer::{i256, ArrowNativeType, Buffer, OffsetBuffer};
 <span class="kw">use </span>arrow_data::ArrayData;
 <span class="kw">use </span>arrow_schema::<span class="kw-2">*</span>;
 <span class="kw">use </span>arrow_select::take::take;
@@ -9484,20 +9377,11 @@
 }
 
 <span class="doccomment">/// Cast the array from interval to duration
-</span><span class="kw">fn </span>cast_interval_to_duration&lt;D: ArrowTemporalType&lt;Native = i64&gt;&gt;(
+</span><span class="kw">fn </span>cast_month_day_nano_to_duration&lt;D: ArrowTemporalType&lt;Native = i64&gt;&gt;(
     array: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Array,
     cast_options: <span class="kw-2">&amp;</span>CastOptions,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;ArrayRef, ArrowError&gt; {
-    <span class="kw">let </span>array = array
-        .as_any()
-        .downcast_ref::&lt;IntervalMonthDayNanoArray&gt;()
-        .ok_or_else(|| {
-            ArrowError::ComputeError(
-                <span class="string">&quot;Internal Error: Cannot cast interval to IntervalArray of expected type&quot;
-                    </span>.to_string(),
-            )
-        })<span class="question-mark">?</span>;
-
+    <span class="kw">let </span>array = array.as_primitive::&lt;IntervalMonthDayNanoType&gt;();
     <span class="kw">let </span>scale = <span class="kw">match </span>D::DATA_TYPE {
         DataType::Duration(TimeUnit::Second) =&gt; <span class="number">1_000_000_000</span>,
         DataType::Duration(TimeUnit::Millisecond) =&gt; <span class="number">1_000_000</span>,
@@ -9507,16 +9391,9 @@
     };
 
     <span class="kw">if </span>cast_options.safe {
-        <span class="kw">let </span>iter = array.iter().map(|v| {
-            v.and_then(|v| {
-                <span class="kw">let </span>v = v / scale;
-                <span class="kw">if </span>v &gt; i64::MAX <span class="kw">as </span>i128 {
-                    <span class="prelude-val">None
-                </span>} <span class="kw">else </span>{
-                    <span class="prelude-val">Some</span>(v <span class="kw">as </span>i64)
-                }
-            })
-        });
+        <span class="kw">let </span>iter = array
+            .iter()
+            .map(|v| v.and_then(|v| (v &gt;&gt; <span class="number">64 </span>== <span class="number">0</span>).then_some((v <span class="kw">as </span>i64) / scale)));
         <span class="prelude-val">Ok</span>(Arc::new(<span class="kw">unsafe </span>{
             PrimitiveArray::&lt;D&gt;::from_trusted_len_iter(iter)
         }))
@@ -9524,17 +9401,9 @@
         <span class="kw">let </span>vec = array
             .iter()
             .map(|v| {
-                v.map(|v| {
-                    <span class="kw">let </span>v = v / scale;
-                    <span class="kw">if </span>v &gt; i64::MAX <span class="kw">as </span>i128 {
-                        <span class="prelude-val">Err</span>(ArrowError::ComputeError(<span class="macro">format!</span>(
-                            <span class="string">&quot;Cannot cast to {:?}. Overflowing on {:?}&quot;</span>,
-                            D::DATA_TYPE,
-                            v
-                        )))
-                    } <span class="kw">else </span>{
-                        <span class="prelude-val">Ok</span>(v <span class="kw">as </span>i64)
-                    }
+                v.map(|v| <span class="kw">match </span>v &gt;&gt; <span class="number">64 </span>{
+                    <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>((v <span class="kw">as </span>i64) / scale),
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ArrowError::ComputeError(<span class="string">&quot;Cannot convert interval containing non-zero months or days to duration&quot;</span>.to_string()))
                 })
                 .transpose()
             })
@@ -9681,21 +9550,6 @@
     <span class="kw">let </span>array = array.as_primitive::&lt;D&gt;();
     <span class="kw">let </span>array = array.unary::&lt;<span class="kw">_</span>, T&gt;(op);
     <span class="prelude-val">Ok</span>(Arc::new(array))
-}
-
-<span class="comment">// cast the List array to Utf8 array
-</span><span class="macro">macro_rules! </span>cast_list_to_string {
-    (<span class="macro-nonterminal">$ARRAY</span>:expr, <span class="macro-nonterminal">$SIZE</span>:ident) =&gt; {{
-        <span class="kw">let </span><span class="kw-2">mut </span>value_builder: GenericStringBuilder&lt;<span class="macro-nonterminal">$SIZE</span>&gt; = GenericStringBuilder::new();
-        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="macro-nonterminal">$ARRAY</span>.len() {
-            <span class="kw">if </span><span class="macro-nonterminal">$ARRAY</span>.is_null(i) {
-                value_builder.append_null();
-            } <span class="kw">else </span>{
-                value_builder.append_value(array_value_to_string(<span class="macro-nonterminal">$ARRAY</span>, i)<span class="question-mark">?</span>);
-            }
-        }
-        <span class="prelude-val">Ok</span>(Arc::new(value_builder.finish()))
-    }};
 }
 
 <span class="kw">fn </span>make_timestamp_array(
@@ -9861,8 +9715,8 @@
             }
         }
         (List(<span class="kw">_</span>) | LargeList(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="kw">match </span>to_type {
-            Utf8 =&gt; <span class="macro">cast_list_to_string!</span>(array, i32),
-            LargeUtf8 =&gt; <span class="macro">cast_list_to_string!</span>(array, i64),
+            Utf8 =&gt; value_to_string::&lt;i32&gt;(array, cast_options),
+            LargeUtf8 =&gt; value_to_string::&lt;i64&gt;(array, cast_options),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ArrowError::CastError(
                 <span class="string">&quot;Cannot cast list to non-list data types&quot;</span>.to_string(),
             )),
@@ -9985,8 +9839,8 @@
                         x <span class="kw">as </span>f64 / <span class="number">10_f64</span>.powi(<span class="kw-2">*</span>scale <span class="kw">as </span>i32)
                     })
                 }
-                Utf8 =&gt; value_to_string::&lt;i32&gt;(array, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>cast_options.format_options)),
-                LargeUtf8 =&gt; value_to_string::&lt;i64&gt;(array, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>cast_options.format_options)),
+                Utf8 =&gt; value_to_string::&lt;i32&gt;(array, cast_options),
+                LargeUtf8 =&gt; value_to_string::&lt;i64&gt;(array, cast_options),
                 Null =&gt; <span class="prelude-val">Ok</span>(new_null_array(to_type, array.len())),
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ArrowError::CastError(<span class="macro">format!</span>(
                     <span class="string">&quot;Casting from {from_type:?} to {to_type:?} not supported&quot;
@@ -10054,8 +9908,8 @@
                         x.to_f64().unwrap() / <span class="number">10_f64</span>.powi(<span class="kw-2">*</span>scale <span class="kw">as </span>i32)
                     })
                 }
-                Utf8 =&gt; value_to_string::&lt;i32&gt;(array, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>cast_options.format_options)),
-                LargeUtf8 =&gt; value_to_string::&lt;i64&gt;(array, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>cast_options.format_options)),
+                Utf8 =&gt; value_to_string::&lt;i32&gt;(array, cast_options),
+                LargeUtf8 =&gt; value_to_string::&lt;i64&gt;(array, cast_options),
                 Null =&gt; <span class="prelude-val">Ok</span>(new_null_array(to_type, array.len())),
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ArrowError::CastError(<span class="macro">format!</span>(
                     <span class="string">&quot;Casting from {from_type:?} to {to_type:?} not supported&quot;
@@ -10276,24 +10130,8 @@
             Float16 =&gt; cast_bool_to_numeric::&lt;Float16Type&gt;(array, cast_options),
             Float32 =&gt; cast_bool_to_numeric::&lt;Float32Type&gt;(array, cast_options),
             Float64 =&gt; cast_bool_to_numeric::&lt;Float64Type&gt;(array, cast_options),
-            Utf8 =&gt; {
-                <span class="kw">let </span>array = array.as_any().downcast_ref::&lt;BooleanArray&gt;().unwrap();
-                <span class="prelude-val">Ok</span>(Arc::new(
-                    array
-                        .iter()
-                        .map(|value| value.map(|value| <span class="kw">if </span>value { <span class="string">&quot;1&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;0&quot; </span>}))
-                        .collect::&lt;StringArray&gt;(),
-                ))
-            }
-            LargeUtf8 =&gt; {
-                <span class="kw">let </span>array = array.as_any().downcast_ref::&lt;BooleanArray&gt;().unwrap();
-                <span class="prelude-val">Ok</span>(Arc::new(
-                    array
-                        .iter()
-                        .map(|value| value.map(|value| <span class="kw">if </span>value { <span class="string">&quot;1&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;0&quot; </span>}))
-                        .collect::&lt;LargeStringArray&gt;(),
-                ))
-            }
+            Utf8 =&gt; value_to_string::&lt;i32&gt;(array, cast_options),
+            LargeUtf8 =&gt; value_to_string::&lt;i64&gt;(array, cast_options),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ArrowError::CastError(<span class="macro">format!</span>(
                 <span class="string">&quot;Casting from {from_type:?} to {to_type:?} not supported&quot;</span>,
             ))),
@@ -10435,8 +10273,8 @@
                 <span class="string">&quot;Casting from {from_type:?} to {to_type:?} not supported&quot;</span>,
             ))),
         },
-        (from_type, LargeUtf8) <span class="kw">if </span>from_type.is_primitive() =&gt; value_to_string::&lt;i64&gt;(array, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>cast_options.format_options)),
-        (from_type, Utf8) <span class="kw">if </span>from_type.is_primitive() =&gt; value_to_string::&lt;i32&gt;(array, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>cast_options.format_options)),
+        (from_type, LargeUtf8) <span class="kw">if </span>from_type.is_primitive() =&gt; value_to_string::&lt;i64&gt;(array, cast_options),
+        (from_type, Utf8) <span class="kw">if </span>from_type.is_primitive() =&gt; value_to_string::&lt;i32&gt;(array, cast_options),
         <span class="comment">// start numeric casts
         </span>(UInt8, UInt16) =&gt; {
             cast_numeric_arrays::&lt;UInt8Type, UInt16Type&gt;(array, cast_options)
@@ -11211,16 +11049,16 @@
             cast_duration_to_interval::&lt;DurationNanosecondType&gt;(array, cast_options)
         }
         (Interval(IntervalUnit::MonthDayNano), Duration(TimeUnit::Second)) =&gt; {
-            cast_interval_to_duration::&lt;DurationSecondType&gt;(array, cast_options)
+            cast_month_day_nano_to_duration::&lt;DurationSecondType&gt;(array, cast_options)
         }
         (Interval(IntervalUnit::MonthDayNano), Duration(TimeUnit::Millisecond)) =&gt; {
-            cast_interval_to_duration::&lt;DurationMillisecondType&gt;(array, cast_options)
+            cast_month_day_nano_to_duration::&lt;DurationMillisecondType&gt;(array, cast_options)
         }
         (Interval(IntervalUnit::MonthDayNano), Duration(TimeUnit::Microsecond)) =&gt; {
-            cast_interval_to_duration::&lt;DurationMicrosecondType&gt;(array, cast_options)
+            cast_month_day_nano_to_duration::&lt;DurationMicrosecondType&gt;(array, cast_options)
         }
         (Interval(IntervalUnit::MonthDayNano), Duration(TimeUnit::Nanosecond)) =&gt; {
-            cast_interval_to_duration::&lt;DurationNanosecondType&gt;(array, cast_options)
+            cast_month_day_nano_to_duration::&lt;DurationNanosecondType&gt;(array, cast_options)
         }
         (Interval(IntervalUnit::YearMonth), Interval(IntervalUnit::MonthDayNano)) =&gt; {
             cast_interval_year_month_to_interval_month_day_nano(array, cast_options)
@@ -11522,14 +11360,10 @@
 
 <span class="kw">fn </span>value_to_string&lt;O: OffsetSizeTrait&gt;(
     array: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Array,
-    options: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>FormatOptions&gt;,
+    options: <span class="kw-2">&amp;</span>CastOptions,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;ArrayRef, ArrowError&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>builder = GenericStringBuilder::&lt;O&gt;::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>fmt_options = <span class="kw-2">&amp;</span>FormatOptions::default();
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(fmt_opts) = options {
-        fmt_options = fmt_opts;
-    };
-    <span class="kw">let </span>formatter = ArrayFormatter::try_new(array, fmt_options)<span class="question-mark">?</span>;
+    <span class="kw">let </span>formatter = ArrayFormatter::try_new(array, <span class="kw-2">&amp;</span>options.format_options)<span class="question-mark">?</span>;
     <span class="kw">let </span>nulls = array.nulls();
     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..array.len() {
         <span class="kw">match </span>nulls.map(|x| x.is_null(i)).unwrap_or_default() {
@@ -12123,19 +11957,7 @@
 {
     <span class="kw">let </span>dict_array = array.as_dictionary::&lt;K&gt;();
     <span class="kw">let </span>cast_dict_values = cast_with_options(dict_array.values(), to_type, cast_options)<span class="question-mark">?</span>;
-    <span class="kw">let </span>keys = dict_array.keys();
-    <span class="kw">match </span>K::DATA_TYPE {
-        DataType::Int32 =&gt; {
-            <span class="comment">// Dictionary guarantees all non-null keys &gt;= 0
-            </span><span class="kw">let </span>buffer = ScalarBuffer::new(keys.values().inner().clone(), <span class="number">0</span>, keys.len());
-            <span class="kw">let </span>indices = PrimitiveArray::new(buffer, keys.nulls().cloned());
-            take::&lt;UInt32Type&gt;(cast_dict_values.as_ref(), <span class="kw-2">&amp;</span>indices, <span class="prelude-val">None</span>)
-        }
-        <span class="kw">_ </span>=&gt; {
-            <span class="kw">let </span>indices = cast_with_options(keys, <span class="kw-2">&amp;</span>DataType::UInt32, cast_options)<span class="question-mark">?</span>;
-            take::&lt;UInt32Type&gt;(cast_dict_values.as_ref(), indices.as_primitive(), <span class="prelude-val">None</span>)
-        }
-    }
+    take(cast_dict_values.as_ref(), dict_array.keys(), <span class="prelude-val">None</span>)
 }
 
 <span class="doccomment">/// Attempts to encode an array into an `ArrayDictionary` with index
@@ -12536,50 +12358,24 @@
 
     <span class="macro">macro_rules! </span>generate_cast_test_case {
         (<span class="macro-nonterminal">$INPUT_ARRAY</span>: expr, <span class="macro-nonterminal">$OUTPUT_TYPE_ARRAY</span>: ident, <span class="macro-nonterminal">$OUTPUT_TYPE</span>: expr, <span class="macro-nonterminal">$OUTPUT_VALUES</span>: expr) =&gt; {
+            <span class="kw">let </span>output = <span class="macro-nonterminal">$OUTPUT_TYPE_ARRAY::from</span>(<span class="macro-nonterminal">$OUTPUT_VALUES</span>)
+                .with_data_type(<span class="macro-nonterminal">$OUTPUT_TYPE</span>.clone());
+
             <span class="comment">// assert cast type
             </span><span class="kw">let </span>input_array_type = <span class="macro-nonterminal">$INPUT_ARRAY</span>.data_type();
             <span class="macro">assert!</span>(can_cast_types(input_array_type, <span class="macro-nonterminal">$OUTPUT_TYPE</span>));
-            <span class="kw">let </span>casted_array = cast(<span class="macro-nonterminal">$INPUT_ARRAY</span>, <span class="macro-nonterminal">$OUTPUT_TYPE</span>).unwrap();
-            <span class="kw">let </span>result_array = casted_array
-                .as_any()
-                .downcast_ref::&lt;<span class="macro-nonterminal">$OUTPUT_TYPE_ARRAY</span>&gt;()
-                .unwrap();
-            <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$OUTPUT_TYPE</span>, result_array.data_type());
-            <span class="macro">assert_eq!</span>(result_array.len(), <span class="macro-nonterminal">$OUTPUT_VALUES</span>.len());
-            <span class="kw">for </span>(i, x) <span class="kw">in </span><span class="macro-nonterminal">$OUTPUT_VALUES</span>.iter().enumerate() {
-                <span class="kw">match </span>x {
-                    <span class="prelude-val">Some</span>(x) =&gt; {
-                        <span class="macro">assert!</span>(!result_array.is_null(i));
-                        <span class="macro">assert_eq!</span>(result_array.value(i), <span class="kw-2">*</span>x);
-                    }
-                    <span class="prelude-val">None </span>=&gt; {
-                        <span class="macro">assert!</span>(result_array.is_null(i));
-                    }
-                }
-            }
+            <span class="kw">let </span>result = cast(<span class="macro-nonterminal">$INPUT_ARRAY</span>, <span class="macro-nonterminal">$OUTPUT_TYPE</span>).unwrap();
+            <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$OUTPUT_TYPE</span>, result.data_type());
+            <span class="macro">assert_eq!</span>(result.as_ref(), <span class="kw-2">&amp;</span>output);
 
             <span class="kw">let </span>cast_option = CastOptions {
                 safe: <span class="bool-val">false</span>,
                 format_options: FormatOptions::default(),
             };
-            <span class="kw">let </span>casted_array_with_option =
+            <span class="kw">let </span>result =
                 cast_with_options(<span class="macro-nonterminal">$INPUT_ARRAY</span>, <span class="macro-nonterminal">$OUTPUT_TYPE</span>, <span class="kw-2">&amp;</span>cast_option).unwrap();
-            <span class="kw">let </span>result_array = casted_array_with_option
-                .as_any()
-                .downcast_ref::&lt;<span class="macro-nonterminal">$OUTPUT_TYPE_ARRAY</span>&gt;()
-                .unwrap();
-            <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$OUTPUT_TYPE</span>, result_array.data_type());
-            <span class="macro">assert_eq!</span>(result_array.len(), <span class="macro-nonterminal">$OUTPUT_VALUES</span>.len());
-            <span class="kw">for </span>(i, x) <span class="kw">in </span><span class="macro-nonterminal">$OUTPUT_VALUES</span>.iter().enumerate() {
-                <span class="kw">match </span>x {
-                    <span class="prelude-val">Some</span>(x) =&gt; {
-                        <span class="macro">assert_eq!</span>(result_array.value(i), <span class="kw-2">*</span>x);
-                    }
-                    <span class="prelude-val">None </span>=&gt; {
-                        <span class="macro">assert!</span>(result_array.is_null(i));
-                    }
-                }
-            }
+            <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$OUTPUT_TYPE</span>, result.data_type());
+            <span class="macro">assert_eq!</span>(result.as_ref(), <span class="kw-2">&amp;</span>output);
         };
     }
 
@@ -13821,6 +13617,26 @@
         <span class="kw">let </span>c = b.as_primitive::&lt;Int32Type&gt;();
         <span class="macro">assert_eq!</span>(<span class="number">1</span>, c.value(<span class="number">0</span>));
         <span class="macro">assert_eq!</span>(<span class="number">0</span>, c.value(<span class="number">1</span>));
+        <span class="macro">assert!</span>(!c.is_valid(<span class="number">2</span>));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_cast_bool_to_utf8() {
+        <span class="kw">let </span>array = BooleanArray::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="bool-val">true</span>), <span class="prelude-val">Some</span>(<span class="bool-val">false</span>), <span class="prelude-val">None</span>]);
+        <span class="kw">let </span>b = cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::Utf8).unwrap();
+        <span class="kw">let </span>c = b.as_any().downcast_ref::&lt;StringArray&gt;().unwrap();
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;true&quot;</span>, c.value(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;false&quot;</span>, c.value(<span class="number">1</span>));
+        <span class="macro">assert!</span>(!c.is_valid(<span class="number">2</span>));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_cast_bool_to_large_utf8() {
+        <span class="kw">let </span>array = BooleanArray::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="bool-val">true</span>), <span class="prelude-val">Some</span>(<span class="bool-val">false</span>), <span class="prelude-val">None</span>]);
+        <span class="kw">let </span>b = cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::LargeUtf8).unwrap();
+        <span class="kw">let </span>c = b.as_any().downcast_ref::&lt;LargeStringArray&gt;().unwrap();
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;true&quot;</span>, c.value(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;false&quot;</span>, c.value(<span class="number">1</span>));
         <span class="macro">assert!</span>(!c.is_valid(<span class="number">2</span>));
     }
 
@@ -15085,7 +14901,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_str_to_str_casts() {
-        <span class="kw">for </span>data <span class="kw">in </span><span class="macro">vec!</span>[
+        <span class="kw">for </span>data <span class="kw">in </span>[
             <span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="string">&quot;foo&quot;</span>), <span class="prelude-val">Some</span>(<span class="string">&quot;bar&quot;</span>), <span class="prelude-val">Some</span>(<span class="string">&quot;ham&quot;</span>)],
             <span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="string">&quot;foo&quot;</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;bar&quot;</span>)],
         ] {
@@ -16309,9 +16125,8 @@
         <span class="macro">assert_eq!</span>(array.data_type(), <span class="kw-2">&amp;</span>data_type);
         <span class="kw">let </span>cast_array = cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::Null).expect(<span class="string">&quot;cast failed&quot;</span>);
         <span class="macro">assert_eq!</span>(cast_array.data_type(), <span class="kw-2">&amp;</span>DataType::Null);
-        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">4 </span>{
-            <span class="macro">assert!</span>(cast_array.is_null(i));
-        }
+        <span class="macro">assert_eq!</span>(cast_array.len(), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(cast_array.logical_nulls().unwrap().null_count(), <span class="number">4</span>);
     }
 
     <span class="attr">#[test]
@@ -16410,14 +16225,10 @@
 
     <span class="doccomment">/// Print the `DictionaryArray` `array` as a vector of strings
     </span><span class="kw">fn </span>array_to_strings(array: <span class="kw-2">&amp;</span>ArrayRef) -&gt; Vec&lt;String&gt; {
+        <span class="kw">let </span>options = FormatOptions::new().with_null(<span class="string">&quot;null&quot;</span>);
+        <span class="kw">let </span>formatter = ArrayFormatter::try_new(array.as_ref(), <span class="kw-2">&amp;</span>options).unwrap();
         (<span class="number">0</span>..array.len())
-            .map(|i| {
-                <span class="kw">if </span>array.is_null(i) {
-                    <span class="string">&quot;null&quot;</span>.to_string()
-                } <span class="kw">else </span>{
-                    array_value_to_string(array, i).expect(<span class="string">&quot;Convert array to String&quot;</span>)
-                }
-            })
+            .map(|i| formatter.value(i).to_string())
             .collect()
     }
 
@@ -17661,29 +17472,16 @@
     }
 
     <span class="doccomment">/// helper function to test casting from duration to interval
-    </span><span class="kw">fn </span>cast_from_duration_to_interval&lt;T: ArrowTemporalType&gt;(
+    </span><span class="kw">fn </span>cast_from_duration_to_interval&lt;T: ArrowTemporalType&lt;Native = i64&gt;&gt;(
         array: Vec&lt;i64&gt;,
         cast_options: <span class="kw-2">&amp;</span>CastOptions,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;PrimitiveArray&lt;IntervalMonthDayNanoType&gt;, ArrowError&gt;
-    <span class="kw">where
-        </span>arrow_array::PrimitiveArray&lt;T&gt;: From&lt;Vec&lt;i64&gt;&gt;,
-    {
-        <span class="kw">let </span>array = PrimitiveArray::&lt;T&gt;::from(array);
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;PrimitiveArray&lt;IntervalMonthDayNanoType&gt;, ArrowError&gt; {
+        <span class="kw">let </span>array = PrimitiveArray::&lt;T&gt;::new(array.into(), <span class="prelude-val">None</span>);
         <span class="kw">let </span>array = Arc::new(array) <span class="kw">as </span>ArrayRef;
-        <span class="kw">let </span>casted_array = cast_with_options(
-            <span class="kw-2">&amp;</span>array,
-            <span class="kw-2">&amp;</span>DataType::Interval(IntervalUnit::MonthDayNano),
-            cast_options,
-        )<span class="question-mark">?</span>;
-        casted_array
-            .as_any()
-            .downcast_ref::&lt;IntervalMonthDayNanoArray&gt;()
-            .ok_or_else(|| {
-                ArrowError::ComputeError(
-                    <span class="string">&quot;Failed to downcast to IntervalMonthDayNanoArray&quot;</span>.to_string(),
-                )
-            })
-            .cloned()
+        <span class="kw">let </span>interval = DataType::Interval(IntervalUnit::MonthDayNano);
+        <span class="kw">let </span>out = cast_with_options(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>interval, cast_options)<span class="question-mark">?</span>;
+        <span class="kw">let </span>out = out.as_primitive::&lt;IntervalMonthDayNanoType&gt;().clone();
+        <span class="prelude-val">Ok</span>(out)
     }
 
     <span class="attr">#[test]
@@ -17805,11 +17603,9 @@
 
     <span class="doccomment">/// helper function to test casting from interval to duration
     </span><span class="kw">fn </span>cast_from_interval_to_duration&lt;T: ArrowTemporalType&gt;(
-        array: Vec&lt;i128&gt;,
+        array: <span class="kw-2">&amp;</span>IntervalMonthDayNanoArray,
         cast_options: <span class="kw-2">&amp;</span>CastOptions,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;PrimitiveArray&lt;T&gt;, ArrowError&gt; {
-        <span class="kw">let </span>array = IntervalMonthDayNanoArray::from(array);
-        <span class="kw">let </span>array = Arc::new(array) <span class="kw">as </span>ArrayRef;
         <span class="kw">let </span>casted_array = cast_with_options(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>T::DATA_TYPE, cast_options)<span class="question-mark">?</span>;
         casted_array
             .as_any()
@@ -17825,125 +17621,89 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_cast_from_interval_to_duration() {
+        <span class="kw">let </span>nullable = CastOptions::default();
+        <span class="kw">let </span>fallible = CastOptions {
+            safe: <span class="bool-val">false</span>,
+            format_options: FormatOptions::default(),
+        };
+
         <span class="comment">// from interval month day nano to duration second
-        </span><span class="kw">let </span>array = <span class="macro">vec!</span>[<span class="number">1234567</span>];
-        <span class="kw">let </span>casted_array = cast_from_interval_to_duration::&lt;DurationSecondType&gt;(
-            array,
-            <span class="kw-2">&amp;</span>CastOptions::default(),
-        )
-        .unwrap();
-        <span class="macro">assert_eq!</span>(
-            casted_array.data_type(),
-            <span class="kw-2">&amp;</span>DataType::Duration(TimeUnit::Second)
-        );
+        </span><span class="kw">let </span>array = <span class="macro">vec!</span>[<span class="number">1234567</span>].into();
+        <span class="kw">let </span>casted_array: DurationSecondArray =
+            cast_from_interval_to_duration(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>nullable).unwrap();
         <span class="macro">assert_eq!</span>(casted_array.value(<span class="number">0</span>), <span class="number">0</span>);
 
-        <span class="kw">let </span>array = <span class="macro">vec!</span>[i128::MAX];
-        <span class="kw">let </span>casted_array = cast_from_interval_to_duration::&lt;DurationSecondType&gt;(
-            array.clone(),
-            <span class="kw-2">&amp;</span>CastOptions::default(),
-        )
-        .unwrap();
+        <span class="kw">let </span>array = <span class="macro">vec!</span>[i128::MAX].into();
+        <span class="kw">let </span>casted_array: DurationSecondArray =
+            cast_from_interval_to_duration(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>nullable).unwrap();
         <span class="macro">assert!</span>(!casted_array.is_valid(<span class="number">0</span>));
 
-        <span class="kw">let </span>casted_array = cast_from_interval_to_duration::&lt;DurationSecondType&gt;(
-            array,
-            <span class="kw-2">&amp;</span>CastOptions {
-                safe: <span class="bool-val">false</span>,
-                format_options: FormatOptions::default(),
-            },
-        );
-        <span class="macro">assert!</span>(casted_array.is_err());
+        <span class="kw">let </span>res = cast_from_interval_to_duration::&lt;DurationSecondType&gt;(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>fallible);
+        <span class="macro">assert!</span>(res.is_err());
 
         <span class="comment">// from interval month day nano to duration millisecond
-        </span><span class="kw">let </span>array = <span class="macro">vec!</span>[<span class="number">1234567</span>];
-        <span class="kw">let </span>casted_array = cast_from_interval_to_duration::&lt;DurationMillisecondType&gt;(
-            array,
-            <span class="kw-2">&amp;</span>CastOptions::default(),
-        )
-        .unwrap();
+        </span><span class="kw">let </span>array = <span class="macro">vec!</span>[<span class="number">1234567</span>].into();
+        <span class="kw">let </span>casted_array: DurationMillisecondArray =
+            cast_from_interval_to_duration(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>nullable).unwrap();
         <span class="macro">assert_eq!</span>(casted_array.value(<span class="number">0</span>), <span class="number">1</span>);
 
-        <span class="kw">let </span>array = <span class="macro">vec!</span>[i128::MAX];
-        <span class="kw">let </span>casted_array = cast_from_interval_to_duration::&lt;DurationMillisecondType&gt;(
-            array.clone(),
-            <span class="kw-2">&amp;</span>CastOptions::default(),
-        )
-        .unwrap();
+        <span class="kw">let </span>array = <span class="macro">vec!</span>[i128::MAX].into();
+        <span class="kw">let </span>casted_array: DurationMillisecondArray =
+            cast_from_interval_to_duration(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>nullable).unwrap();
         <span class="macro">assert!</span>(!casted_array.is_valid(<span class="number">0</span>));
 
-        <span class="kw">let </span>casted_array = cast_from_interval_to_duration::&lt;DurationMillisecondType&gt;(
-            array,
-            <span class="kw-2">&amp;</span>CastOptions {
-                safe: <span class="bool-val">false</span>,
-                format_options: FormatOptions::default(),
-            },
-        );
-        <span class="macro">assert!</span>(casted_array.is_err());
+        <span class="kw">let </span>res =
+            cast_from_interval_to_duration::&lt;DurationMillisecondType&gt;(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>fallible);
+        <span class="macro">assert!</span>(res.is_err());
 
         <span class="comment">// from interval month day nano to duration microsecond
-        </span><span class="kw">let </span>array = <span class="macro">vec!</span>[<span class="number">1234567</span>];
-        <span class="kw">let </span>casted_array = cast_from_interval_to_duration::&lt;DurationMicrosecondType&gt;(
-            array,
-            <span class="kw-2">&amp;</span>CastOptions::default(),
-        )
-        .unwrap();
-        <span class="macro">assert_eq!</span>(
-            casted_array.data_type(),
-            <span class="kw-2">&amp;</span>DataType::Duration(TimeUnit::Microsecond)
-        );
+        </span><span class="kw">let </span>array = <span class="macro">vec!</span>[<span class="number">1234567</span>].into();
+        <span class="kw">let </span>casted_array: DurationMicrosecondArray =
+            cast_from_interval_to_duration(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>nullable).unwrap();
         <span class="macro">assert_eq!</span>(casted_array.value(<span class="number">0</span>), <span class="number">1234</span>);
 
-        <span class="kw">let </span>array = <span class="macro">vec!</span>[i128::MAX];
-        <span class="kw">let </span>casted_array = cast_from_interval_to_duration::&lt;DurationMicrosecondType&gt;(
-            array.clone(),
-            <span class="kw-2">&amp;</span>CastOptions::default(),
-        )
-        .unwrap();
+        <span class="kw">let </span>array = <span class="macro">vec!</span>[i128::MAX].into();
+        <span class="kw">let </span>casted_array =
+            cast_from_interval_to_duration::&lt;DurationMicrosecondType&gt;(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>nullable)
+                .unwrap();
         <span class="macro">assert!</span>(!casted_array.is_valid(<span class="number">0</span>));
 
-        <span class="kw">let </span>casted_array = cast_from_interval_to_duration::&lt;DurationMicrosecondType&gt;(
-            array,
-            <span class="kw-2">&amp;</span>CastOptions {
-                safe: <span class="bool-val">false</span>,
-                format_options: FormatOptions::default(),
-            },
-        );
+        <span class="kw">let </span>casted_array =
+            cast_from_interval_to_duration::&lt;DurationMicrosecondType&gt;(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>fallible);
         <span class="macro">assert!</span>(casted_array.is_err());
 
         <span class="comment">// from interval month day nano to duration nanosecond
-        </span><span class="kw">let </span>array = <span class="macro">vec!</span>[<span class="number">1234567</span>];
-        <span class="kw">let </span>casted_array = cast_from_interval_to_duration::&lt;DurationNanosecondType&gt;(
-            array,
-            <span class="kw-2">&amp;</span>CastOptions::default(),
-        )
-        .unwrap();
-        <span class="macro">assert_eq!</span>(
-            casted_array.data_type(),
-            <span class="kw-2">&amp;</span>DataType::Duration(TimeUnit::Nanosecond)
-        );
+        </span><span class="kw">let </span>array = <span class="macro">vec!</span>[<span class="number">1234567</span>].into();
+        <span class="kw">let </span>casted_array: DurationNanosecondArray =
+            cast_from_interval_to_duration(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>nullable).unwrap();
         <span class="macro">assert_eq!</span>(casted_array.value(<span class="number">0</span>), <span class="number">1234567</span>);
 
-        <span class="kw">let </span>array = <span class="macro">vec!</span>[i128::MAX];
-        <span class="kw">let </span>casted_array = cast_from_interval_to_duration::&lt;DurationNanosecondType&gt;(
-            array.clone(),
-            <span class="kw-2">&amp;</span>CastOptions::default(),
-        )
-        .unwrap();
-        <span class="macro">assert_eq!</span>(
-            casted_array.data_type(),
-            <span class="kw-2">&amp;</span>DataType::Duration(TimeUnit::Nanosecond)
-        );
+        <span class="kw">let </span>array = <span class="macro">vec!</span>[i128::MAX].into();
+        <span class="kw">let </span>casted_array: DurationNanosecondArray =
+            cast_from_interval_to_duration(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>nullable).unwrap();
         <span class="macro">assert!</span>(!casted_array.is_valid(<span class="number">0</span>));
 
-        <span class="kw">let </span>casted_array = cast_from_interval_to_duration::&lt;DurationNanosecondType&gt;(
-            array,
-            <span class="kw-2">&amp;</span>CastOptions {
-                safe: <span class="bool-val">false</span>,
-                format_options: FormatOptions::default(),
-            },
-        );
+        <span class="kw">let </span>casted_array =
+            cast_from_interval_to_duration::&lt;DurationNanosecondType&gt;(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>fallible);
         <span class="macro">assert!</span>(casted_array.is_err());
+
+        <span class="kw">let </span>array = <span class="macro">vec!</span>[
+            IntervalMonthDayNanoType::make_value(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>),
+            IntervalMonthDayNanoType::make_value(-<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>),
+            IntervalMonthDayNanoType::make_value(<span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>),
+            IntervalMonthDayNanoType::make_value(<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>),
+            IntervalMonthDayNanoType::make_value(<span class="number">0</span>, <span class="number">0</span>, -<span class="number">1</span>),
+        ]
+        .into();
+        <span class="kw">let </span>casted_array =
+            cast_from_interval_to_duration::&lt;DurationNanosecondType&gt;(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>nullable)
+                .unwrap();
+        <span class="macro">assert!</span>(!casted_array.is_valid(<span class="number">0</span>));
+        <span class="macro">assert!</span>(!casted_array.is_valid(<span class="number">1</span>));
+        <span class="macro">assert!</span>(!casted_array.is_valid(<span class="number">2</span>));
+        <span class="macro">assert!</span>(!casted_array.is_valid(<span class="number">3</span>));
+        <span class="macro">assert!</span>(casted_array.is_valid(<span class="number">4</span>));
+        <span class="macro">assert_eq!</span>(casted_array.value(<span class="number">4</span>), -<span class="number">1</span>);
     }
 
     <span class="doccomment">/// helper function to test casting from interval year month to interval month day nano
@@ -18070,6 +17830,32 @@
 
         <span class="macro">assert_eq!</span>(formatted.value(<span class="number">0</span>).to_string(), <span class="string">&quot;[[1], [2], [3]]&quot;</span>);
         <span class="macro">assert_eq!</span>(formatted.value(<span class="number">1</span>).to_string(), <span class="string">&quot;[[4], [null], [6]]&quot;</span>);
+    }
+
+    <span class="kw">const </span>CAST_OPTIONS: CastOptions&lt;<span class="lifetime">&#39;static</span>&gt; = CastOptions {
+        safe: <span class="bool-val">true</span>,
+        format_options: FormatOptions::new(),
+    };
+
+    <span class="attr">#[test]
+    #[allow(clippy::assertions_on_constants)]
+    </span><span class="kw">fn </span>test_const_options() {
+        <span class="macro">assert!</span>(CAST_OPTIONS.safe)
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_list_format_options() {
+        <span class="kw">let </span>options = CastOptions {
+            safe: <span class="bool-val">false</span>,
+            format_options: FormatOptions::default().with_null(<span class="string">&quot;null&quot;</span>),
+        };
+        <span class="kw">let </span>array = ListArray::from_iter_primitive::&lt;Int32Type, <span class="kw">_</span>, <span class="kw">_</span>&gt;(<span class="macro">vec!</span>[
+            <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>)]),
+            <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="number">2</span>)]),
+        ]);
+        <span class="kw">let </span>a = cast_with_options(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::Utf8, <span class="kw-2">&amp;</span>options).unwrap();
+        <span class="kw">let </span>r: Vec&lt;<span class="kw">_</span>&gt; = a.as_string::&lt;i32&gt;().iter().map(|x| x.unwrap()).collect();
+        <span class="macro">assert_eq!</span>(r, <span class="kw-2">&amp;</span>[<span class="string">&quot;[0, 1, 2]&quot;</span>, <span class="string">&quot;[0, null, 2]&quot;</span>]);
     }
 }
 </code></pre></div></section></main></body></html>
