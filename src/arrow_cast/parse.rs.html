@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-cast/src/parse.rs`."><title>parse.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-47e7ab555ef2818a.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_cast" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (ec08a0337 2023-09-04)" data-channel="nightly" data-search-js="search-5d3eaacf19ebf04f.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-f194925aa375ae96.css" data-theme-dark-css="dark-1dd4d1ce031e15de.css" data-theme-ayu-css="ayu-49e58d069f567085.css" ><script src="../../static.files/storage-db41da1a38ea3cb8.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-ef3a2de404864b0b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-f194925aa375ae96.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1dd4d1ce031e15de.css"><link rel="stylesheet" href="../../static.files/noscript-cffde32267a19fd6.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../arrow_cast/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-cast/src/parse.rs`."><title>parse.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_cast" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (37390d656 2023-09-24)" data-channel="nightly" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../arrow_cast/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2305,11 +2305,6 @@
 <a href="#2305" id="2305">2305</a>
 <a href="#2306" id="2306">2306</a>
 <a href="#2307" id="2307">2307</a>
-<a href="#2308" id="2308">2308</a>
-<a href="#2309" id="2309">2309</a>
-<a href="#2310" id="2310">2310</a>
-<a href="#2311" id="2311">2311</a>
-<a href="#2312" id="2312">2312</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2589,16 +2584,11 @@
     to_timestamp_nanos(string_to_datetime(<span class="kw-2">&amp;</span>Utc, s)<span class="question-mark">?</span>.naive_utc())
 }
 
-<span class="doccomment">/// Defensive check to prevent chrono-rs panics when nanosecond conversion happens on non-supported dates
+<span class="doccomment">/// Fallible conversion of [`NaiveDateTime`] to `i64` nanoseconds
 </span><span class="attr">#[inline]
 </span><span class="kw">fn </span>to_timestamp_nanos(dt: NaiveDateTime) -&gt; <span class="prelude-ty">Result</span>&lt;i64, ArrowError&gt; {
-    <span class="kw">if </span>dt.timestamp().checked_mul(<span class="number">1_000_000_000</span>).is_none() {
-        <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ParseError(
-            ERR_NANOSECONDS_NOT_SUPPORTED.to_string(),
-        ));
-    }
-
-    <span class="prelude-val">Ok</span>(dt.timestamp_nanos())
+    dt.timestamp_nanos_opt()
+        .ok_or_else(|| ArrowError::ParseError(ERR_NANOSECONDS_NOT_SUPPORTED.to_string()))
 }
 
 <span class="doccomment">/// Accepts a string in ISO8601 standard format and some
@@ -3625,12 +3615,12 @@
 
         <span class="comment">// Ensure both T and &#39; &#39; variants work
         </span><span class="macro">assert_eq!</span>(
-            naive_datetime.timestamp_nanos(),
+            naive_datetime.timestamp_nanos_opt().unwrap(),
             parse_timestamp(<span class="string">&quot;2020-09-08T13:42:29.190855&quot;</span>).unwrap()
         );
 
         <span class="macro">assert_eq!</span>(
-            naive_datetime.timestamp_nanos(),
+            naive_datetime.timestamp_nanos_opt().unwrap(),
             parse_timestamp(<span class="string">&quot;2020-09-08 13:42:29.190855&quot;</span>).unwrap()
         );
 
@@ -3643,12 +3633,12 @@
 
         <span class="comment">// Ensure both T and &#39; &#39; variants work
         </span><span class="macro">assert_eq!</span>(
-            naive_datetime_whole_secs.timestamp_nanos(),
+            naive_datetime_whole_secs.timestamp_nanos_opt().unwrap(),
             parse_timestamp(<span class="string">&quot;2020-09-08T13:42:29&quot;</span>).unwrap()
         );
 
         <span class="macro">assert_eq!</span>(
-            naive_datetime_whole_secs.timestamp_nanos(),
+            naive_datetime_whole_secs.timestamp_nanos_opt().unwrap(),
             parse_timestamp(<span class="string">&quot;2020-09-08 13:42:29&quot;</span>).unwrap()
         );
 
@@ -3661,7 +3651,7 @@
         );
 
         <span class="macro">assert_eq!</span>(
-            naive_datetime_no_time.timestamp_nanos(),
+            naive_datetime_no_time.timestamp_nanos_opt().unwrap(),
             parse_timestamp(<span class="string">&quot;2020-09-08&quot;</span>).unwrap()
         )
     }
@@ -3775,12 +3765,12 @@
 
         <span class="comment">// Ensure both T and &#39; &#39; variants work
         </span><span class="macro">assert_eq!</span>(
-            naive_datetime.timestamp_nanos(),
+            naive_datetime.timestamp_nanos_opt().unwrap(),
             parse_timestamp(<span class="string">&quot;2020-09-08T13:42:29.190855&quot;</span>).unwrap()
         );
 
         <span class="macro">assert_eq!</span>(
-            naive_datetime.timestamp_nanos(),
+            naive_datetime.timestamp_nanos_opt().unwrap(),
             parse_timestamp(<span class="string">&quot;2020-09-08 13:42:29.190855&quot;</span>).unwrap()
         );
 
@@ -3791,12 +3781,12 @@
 
         <span class="comment">// Ensure both T and &#39; &#39; variants work
         </span><span class="macro">assert_eq!</span>(
-            naive_datetime.timestamp_nanos(),
+            naive_datetime.timestamp_nanos_opt().unwrap(),
             parse_timestamp(<span class="string">&quot;2020-09-08T13:42:29&quot;</span>).unwrap()
         );
 
         <span class="macro">assert_eq!</span>(
-            naive_datetime.timestamp_nanos(),
+            naive_datetime.timestamp_nanos_opt().unwrap(),
             parse_timestamp(<span class="string">&quot;2020-09-08 13:42:29&quot;</span>).unwrap()
         );
 
