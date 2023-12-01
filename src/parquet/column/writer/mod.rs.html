@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/column/writer/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (5facb422f 2023-11-28)" data-channel="nightly" data-search-js="search-56a624991a76cfad.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/column/writer/mod.rs`."><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e6a78389201e676c.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (87e1447aa 2023-11-30)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -3457,6 +3457,47 @@
 <a href="#3457" id="3457">3457</a>
 <a href="#3458" id="3458">3458</a>
 <a href="#3459" id="3459">3459</a>
+<a href="#3460" id="3460">3460</a>
+<a href="#3461" id="3461">3461</a>
+<a href="#3462" id="3462">3462</a>
+<a href="#3463" id="3463">3463</a>
+<a href="#3464" id="3464">3464</a>
+<a href="#3465" id="3465">3465</a>
+<a href="#3466" id="3466">3466</a>
+<a href="#3467" id="3467">3467</a>
+<a href="#3468" id="3468">3468</a>
+<a href="#3469" id="3469">3469</a>
+<a href="#3470" id="3470">3470</a>
+<a href="#3471" id="3471">3471</a>
+<a href="#3472" id="3472">3472</a>
+<a href="#3473" id="3473">3473</a>
+<a href="#3474" id="3474">3474</a>
+<a href="#3475" id="3475">3475</a>
+<a href="#3476" id="3476">3476</a>
+<a href="#3477" id="3477">3477</a>
+<a href="#3478" id="3478">3478</a>
+<a href="#3479" id="3479">3479</a>
+<a href="#3480" id="3480">3480</a>
+<a href="#3481" id="3481">3481</a>
+<a href="#3482" id="3482">3482</a>
+<a href="#3483" id="3483">3483</a>
+<a href="#3484" id="3484">3484</a>
+<a href="#3485" id="3485">3485</a>
+<a href="#3486" id="3486">3486</a>
+<a href="#3487" id="3487">3487</a>
+<a href="#3488" id="3488">3488</a>
+<a href="#3489" id="3489">3489</a>
+<a href="#3490" id="3490">3490</a>
+<a href="#3491" id="3491">3491</a>
+<a href="#3492" id="3492">3492</a>
+<a href="#3493" id="3493">3493</a>
+<a href="#3494" id="3494">3494</a>
+<a href="#3495" id="3495">3495</a>
+<a href="#3496" id="3496">3496</a>
+<a href="#3497" id="3497">3497</a>
+<a href="#3498" id="3498">3498</a>
+<a href="#3499" id="3499">3499</a>
+<a href="#3500" id="3500">3500</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -3791,7 +3832,10 @@
         <span class="comment">// If only computing chunk-level statistics compute them here, page-level statistics
         // are computed in [`Self::write_mini_batch`] and used to update chunk statistics in
         // [`Self::add_data_page`]
-        </span><span class="kw">if </span><span class="self">self</span>.statistics_enabled == EnabledStatistics::Chunk {
+        </span><span class="kw">if </span><span class="self">self</span>.statistics_enabled == EnabledStatistics::Chunk
+            <span class="comment">// INTERVAL has undefined sort order, so don&#39;t write min/max stats for it
+            </span>&amp;&amp; <span class="self">self</span>.descr.converted_type() != ConvertedType::INTERVAL
+        {
             <span class="kw">match </span>(min, max) {
                 (<span class="prelude-val">Some</span>(min), <span class="prelude-val">Some</span>(max)) =&gt; {
                     update_min(<span class="kw-2">&amp;</span><span class="self">self</span>.descr, min, <span class="kw-2">&amp;mut </span><span class="self">self</span>.column_metrics.min_column_value);
@@ -4552,7 +4596,6 @@
 ///
 /// If `cur` is `None`, sets `cur` to `Some(val)`, otherwise calls `should_update` with
 /// the value of `cur`, and updates `cur` to `Some(val)` if it returns `true`
-
 </span><span class="kw">fn </span>update_stat&lt;T: ParquetValueType, F&gt;(
     descr: <span class="kw-2">&amp;</span>ColumnDescriptor,
     val: <span class="kw-2">&amp;</span>T,
@@ -6525,6 +6568,30 @@
         <span class="prelude-val">Ok</span>(())
     }
 
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_interval_stats_should_not_have_min_max() {
+        <span class="kw">let </span>input = [
+            <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
+            <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>],
+            <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>],
+        ]
+        .into_iter()
+        .map(|s| ByteArray::from(s).into())
+        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+
+        <span class="kw">let </span>page_writer = get_test_page_writer();
+        <span class="kw">let </span><span class="kw-2">mut </span>writer = get_test_interval_column_writer(page_writer);
+        writer.write_batch(<span class="kw-2">&amp;</span>input, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>).unwrap();
+
+        <span class="kw">let </span>metadata = writer.close().unwrap().metadata;
+        <span class="kw">let </span>stats = <span class="kw">if let </span><span class="prelude-val">Some</span>(Statistics::FixedLenByteArray(stats)) = metadata.statistics() {
+            stats.clone()
+        } <span class="kw">else </span>{
+            <span class="macro">panic!</span>(<span class="string">&quot;metadata missing statistics&quot;</span>);
+        };
+        <span class="macro">assert!</span>(!stats.has_min_max_set());
+    }
+
     <span class="kw">fn </span>write_multiple_pages&lt;T: DataType&gt;(
         column_descr: <span class="kw-2">&amp;</span>Arc&lt;ColumnDescriptor&gt;,
         pages: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[<span class="prelude-ty">Option</span>&lt;T::T&gt;]],
@@ -6854,8 +6921,7 @@
         values: <span class="kw-2">&amp;</span>[FixedLenByteArray],
     ) -&gt; ValueStatistics&lt;FixedLenByteArray&gt; {
         <span class="kw">let </span>page_writer = get_test_page_writer();
-        <span class="kw">let </span>props = Default::default();
-        <span class="kw">let </span><span class="kw-2">mut </span>writer = get_test_float16_column_writer(page_writer, <span class="number">0</span>, <span class="number">0</span>, props);
+        <span class="kw">let </span><span class="kw-2">mut </span>writer = get_test_float16_column_writer(page_writer);
         writer.write_batch(values, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>).unwrap();
 
         <span class="kw">let </span>metadata = writer.close().unwrap().metadata;
@@ -6868,12 +6934,9 @@
 
     <span class="kw">fn </span>get_test_float16_column_writer(
         page_writer: Box&lt;<span class="kw">dyn </span>PageWriter&gt;,
-        max_def_level: i16,
-        max_rep_level: i16,
-        props: WriterPropertiesPtr,
     ) -&gt; ColumnWriterImpl&lt;<span class="lifetime">&#39;static</span>, FixedLenByteArrayType&gt; {
-        <span class="kw">let </span>descr = Arc::new(get_test_float16_column_descr(max_def_level, max_rep_level));
-        <span class="kw">let </span>column_writer = get_column_writer(descr, props, page_writer);
+        <span class="kw">let </span>descr = Arc::new(get_test_float16_column_descr(<span class="number">0</span>, <span class="number">0</span>));
+        <span class="kw">let </span>column_writer = get_column_writer(descr, Default::default(), page_writer);
         get_typed_column_writer::&lt;FixedLenByteArrayType&gt;(column_writer)
     }
 
@@ -6886,6 +6949,25 @@
                 .build()
                 .unwrap();
         ColumnDescriptor::new(Arc::new(tpe), max_def_level, max_rep_level, path)
+    }
+
+    <span class="kw">fn </span>get_test_interval_column_writer(
+        page_writer: Box&lt;<span class="kw">dyn </span>PageWriter&gt;,
+    ) -&gt; ColumnWriterImpl&lt;<span class="lifetime">&#39;static</span>, FixedLenByteArrayType&gt; {
+        <span class="kw">let </span>descr = Arc::new(get_test_interval_column_descr());
+        <span class="kw">let </span>column_writer = get_column_writer(descr, Default::default(), page_writer);
+        get_typed_column_writer::&lt;FixedLenByteArrayType&gt;(column_writer)
+    }
+
+    <span class="kw">fn </span>get_test_interval_column_descr() -&gt; ColumnDescriptor {
+        <span class="kw">let </span>path = ColumnPath::from(<span class="string">&quot;col&quot;</span>);
+        <span class="kw">let </span>tpe =
+            SchemaType::primitive_type_builder(<span class="string">&quot;col&quot;</span>, FixedLenByteArrayType::get_physical_type())
+                .with_length(<span class="number">12</span>)
+                .with_converted_type(ConvertedType::INTERVAL)
+                .build()
+                .unwrap();
+        ColumnDescriptor::new(Arc::new(tpe), <span class="number">0</span>, <span class="number">0</span>, path)
     }
 
     <span class="doccomment">/// Returns column writer for UINT32 Column provided as ConvertedType only
