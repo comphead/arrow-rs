@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-arith/src/aggregate.rs`."><title>aggregate.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e6a78389201e676c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_arith" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (87e1447aa 2023-11-30)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-arith/src/aggregate.rs`."><title>aggregate.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_arith" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (e9013ac0e 2023-12-05)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1476,14 +1476,14 @@
 // distributed with this work for additional information
 // regarding copyright ownership.  The ASF licenses this file
 // to you under the Apache License, Version 2.0 (the
-// &quot;License&quot;); you may not use this file except in compliance
+// "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
-// &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
@@ -1508,7 +1508,7 @@
 
 <span class="doccomment">/// Returns the minimum value in the array, according to the natural order.
 /// For floating point arrays any NaN values are considered to be greater than any other non-null value
-</span><span class="attr">#[cfg(not(feature = <span class="string">&quot;simd&quot;</span>))]
+</span><span class="attr">#[cfg(not(feature = <span class="string">"simd"</span>))]
 </span><span class="kw">pub fn </span>min&lt;T&gt;(array: <span class="kw-2">&amp;</span>PrimitiveArray&lt;T&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;T::Native&gt;
 <span class="kw">where
     </span>T: ArrowNumericType,
@@ -1519,7 +1519,7 @@
 
 <span class="doccomment">/// Returns the maximum value in the array, according to the natural order.
 /// For floating point arrays any NaN values are considered to be greater than any other non-null value
-</span><span class="attr">#[cfg(not(feature = <span class="string">&quot;simd&quot;</span>))]
+</span><span class="attr">#[cfg(not(feature = <span class="string">"simd"</span>))]
 </span><span class="kw">pub fn </span>max&lt;T&gt;(array: <span class="kw-2">&amp;</span>PrimitiveArray&lt;T&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;T::Native&gt;
 <span class="kw">where
     </span>T: ArrowNumericType,
@@ -1628,7 +1628,7 @@
 
 <span class="doccomment">/// Returns the sum of values in the array.
 ///
-/// This doesn&#39;t detect overflow. Once overflowing, the result will wrap around.
+/// This doesn't detect overflow. Once overflowing, the result will wrap around.
 /// For an overflow-checking variant, use `sum_array_checked` instead.
 </span><span class="kw">pub fn </span>sum_array&lt;T, A: ArrayAccessor&lt;Item = T::Native&gt;&gt;(array: A) -&gt; <span class="prelude-ty">Option</span>&lt;T::Native&gt;
 <span class="kw">where
@@ -1736,9 +1736,9 @@
 ///
 /// Returns `None` if the array is empty or only contains null values.
 ///
-/// This doesn&#39;t detect overflow. Once overflowing, the result will wrap around.
+/// This doesn't detect overflow. Once overflowing, the result will wrap around.
 /// For an overflow-checking variant, use `sum_checked` instead.
-</span><span class="attr">#[cfg(not(feature = <span class="string">&quot;simd&quot;</span>))]
+</span><span class="attr">#[cfg(not(feature = <span class="string">"simd"</span>))]
 </span><span class="kw">pub fn </span>sum&lt;T&gt;(array: <span class="kw-2">&amp;</span>PrimitiveArray&lt;T&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;T::Native&gt;
 <span class="kw">where
     </span>T: ArrowNumericType,
@@ -1864,21 +1864,21 @@
     bitand,
     BitAnd,
     -<span class="number">1</span>,
-    <span class="string">&quot;Returns the bitwise and of all non-null input values.&quot;
+    <span class="string">"Returns the bitwise and of all non-null input values."
 </span>);
 <span class="macro">bit_operation!</span>(
     bit_or,
     bitor,
     BitOr,
     <span class="number">0</span>,
-    <span class="string">&quot;Returns the bitwise or of all non-null input values.&quot;
+    <span class="string">"Returns the bitwise or of all non-null input values."
 </span>);
 <span class="macro">bit_operation!</span>(
     bit_xor,
     bitxor,
     BitXor,
     <span class="number">0</span>,
-    <span class="string">&quot;Returns the bitwise xor of all non-null input values.&quot;
+    <span class="string">"Returns the bitwise xor of all non-null input values."
 </span>);
 
 <span class="doccomment">/// Returns true if all non-null input values are true, otherwise false.
@@ -1949,7 +1949,7 @@
     }
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;simd&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"simd"</span>)]
 </span><span class="kw">mod </span>simd {
     <span class="kw">use </span><span class="kw">super</span>::is_nan;
     <span class="kw">use </span>arrow_array::<span class="kw-2">*</span>;
@@ -2027,7 +2027,7 @@
             simd_accumulator: <span class="self">Self</span>::SimdAccumulator,
             scalar_accumulator: <span class="self">Self</span>::ScalarAccumulator,
         ) -&gt; <span class="prelude-ty">Option</span>&lt;T::Native&gt; {
-            <span class="comment">// we can&#39;t use T::lanes() as the slice len because it is not const,
+            <span class="comment">// we can't use T::lanes() as the slice len because it is not const,
             // instead always reserve the maximum number of lanes
             </span><span class="kw">let </span><span class="kw-2">mut </span>tmp = [T::default_value(); <span class="number">64</span>];
             <span class="kw">let </span>slice = <span class="kw-2">&amp;mut </span>tmp[<span class="number">0</span>..T::lanes()];
@@ -2102,7 +2102,7 @@
             simd_accumulator: <span class="self">Self</span>::SimdAccumulator,
             scalar_accumulator: <span class="self">Self</span>::ScalarAccumulator,
         ) -&gt; <span class="prelude-ty">Option</span>&lt;T::Native&gt; {
-            <span class="comment">// we can&#39;t use T::lanes() as the slice len because it is not const,
+            <span class="comment">// we can't use T::lanes() as the slice len because it is not const,
             // instead always reserve the maximum number of lanes
             </span><span class="kw">let </span><span class="kw-2">mut </span>tmp = [T::default_value(); <span class="number">64</span>];
             <span class="kw">let </span>slice = <span class="kw-2">&amp;mut </span>tmp[<span class="number">0</span>..T::lanes()];
@@ -2184,7 +2184,7 @@
             simd_accumulator: <span class="self">Self</span>::SimdAccumulator,
             scalar_accumulator: <span class="self">Self</span>::ScalarAccumulator,
         ) -&gt; <span class="prelude-ty">Option</span>&lt;T::Native&gt; {
-            <span class="comment">// we can&#39;t use T::lanes() as the slice len because it is not const,
+            <span class="comment">// we can't use T::lanes() as the slice len because it is not const,
             // instead always reserve the maximum number of lanes
             </span><span class="kw">let </span><span class="kw-2">mut </span>tmp = [T::default_value(); <span class="number">64</span>];
             <span class="kw">let </span>slice = <span class="kw-2">&amp;mut </span>tmp[<span class="number">0</span>..T::lanes()];
@@ -2278,9 +2278,9 @@
 ///
 /// Returns `None` if the array is empty or only contains null values.
 ///
-/// This doesn&#39;t detect overflow in release mode by default. Once overflowing, the result will
+/// This doesn't detect overflow in release mode by default. Once overflowing, the result will
 /// wrap around. For an overflow-checking variant, use `sum_checked` instead.
-</span><span class="attr">#[cfg(feature = <span class="string">&quot;simd&quot;</span>)]
+</span><span class="attr">#[cfg(feature = <span class="string">"simd"</span>)]
 </span><span class="kw">pub fn </span>sum&lt;T: ArrowNumericType&gt;(array: <span class="kw-2">&amp;</span>PrimitiveArray&lt;T&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;T::Native&gt;
 <span class="kw">where
     </span>T::Native: ArrowNativeTypeOp,
@@ -2290,7 +2290,7 @@
     simd::simd_aggregation::&lt;T, SumAggregate&lt;T&gt;&gt;(<span class="kw-2">&amp;</span>array)
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;simd&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"simd"</span>)]
 </span><span class="doccomment">/// Returns the minimum value in the array, according to the natural order.
 /// For floating point arrays any NaN values are considered to be greater than any other non-null value
 </span><span class="kw">pub fn </span>min&lt;T: ArrowNumericType&gt;(array: <span class="kw-2">&amp;</span>PrimitiveArray&lt;T&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;T::Native&gt;
@@ -2302,7 +2302,7 @@
     simd::simd_aggregation::&lt;T, MinAggregate&lt;T&gt;&gt;(<span class="kw-2">&amp;</span>array)
 }
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;simd&quot;</span>)]
+<span class="attr">#[cfg(feature = <span class="string">"simd"</span>)]
 </span><span class="doccomment">/// Returns the maximum value in the array, according to the natural order.
 /// For floating point arrays any NaN values are considered to be greater than any other non-null value
 </span><span class="kw">pub fn </span>max&lt;T: ArrowNumericType&gt;(array: <span class="kw-2">&amp;</span>PrimitiveArray&lt;T&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;T::Native&gt;
@@ -2662,21 +2662,21 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_binary_min_max_with_nulls() {
         <span class="kw">let </span>a = BinaryArray::from(<span class="macro">vec!</span>[
-            <span class="prelude-val">Some</span>(<span class="string">&quot;b&quot;</span>.as_bytes()),
+            <span class="prelude-val">Some</span>(<span class="string">"b"</span>.as_bytes()),
             <span class="prelude-val">None</span>,
             <span class="prelude-val">None</span>,
-            <span class="prelude-val">Some</span>(<span class="string">b&quot;a&quot;</span>),
-            <span class="prelude-val">Some</span>(<span class="string">b&quot;c&quot;</span>),
+            <span class="prelude-val">Some</span>(<span class="string">b"a"</span>),
+            <span class="prelude-val">Some</span>(<span class="string">b"c"</span>),
         ]);
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>.as_bytes()), min_binary(<span class="kw-2">&amp;</span>a));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;c&quot;</span>.as_bytes()), max_binary(<span class="kw-2">&amp;</span>a));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">"a"</span>.as_bytes()), min_binary(<span class="kw-2">&amp;</span>a));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">"c"</span>.as_bytes()), max_binary(<span class="kw-2">&amp;</span>a));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_binary_min_max_no_null() {
-        <span class="kw">let </span>a = BinaryArray::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="string">&quot;b&quot;</span>.as_bytes()), <span class="prelude-val">Some</span>(<span class="string">b&quot;a&quot;</span>), <span class="prelude-val">Some</span>(<span class="string">b&quot;c&quot;</span>)]);
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>.as_bytes()), min_binary(<span class="kw-2">&amp;</span>a));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;c&quot;</span>.as_bytes()), max_binary(<span class="kw-2">&amp;</span>a));
+        <span class="kw">let </span>a = BinaryArray::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="string">"b"</span>.as_bytes()), <span class="prelude-val">Some</span>(<span class="string">b"a"</span>), <span class="prelude-val">Some</span>(<span class="string">b"c"</span>)]);
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">"a"</span>.as_bytes()), min_binary(<span class="kw-2">&amp;</span>a));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">"c"</span>.as_bytes()), max_binary(<span class="kw-2">&amp;</span>a));
     }
 
     <span class="attr">#[test]
@@ -2688,16 +2688,16 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_binary_min_max_1() {
-        <span class="kw">let </span>a = BinaryArray::from(<span class="macro">vec!</span>[<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;b&quot;</span>.as_bytes()), <span class="prelude-val">Some</span>(<span class="string">b&quot;a&quot;</span>)]);
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>.as_bytes()), min_binary(<span class="kw-2">&amp;</span>a));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;b&quot;</span>.as_bytes()), max_binary(<span class="kw-2">&amp;</span>a));
+        <span class="kw">let </span>a = BinaryArray::from(<span class="macro">vec!</span>[<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">"b"</span>.as_bytes()), <span class="prelude-val">Some</span>(<span class="string">b"a"</span>)]);
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">"a"</span>.as_bytes()), min_binary(<span class="kw-2">&amp;</span>a));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">"b"</span>.as_bytes()), max_binary(<span class="kw-2">&amp;</span>a));
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_string_min_max_with_nulls() {
-        <span class="kw">let </span>a = StringArray::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="string">&quot;b&quot;</span>), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>), <span class="prelude-val">Some</span>(<span class="string">&quot;c&quot;</span>)]);
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>), min_string(<span class="kw-2">&amp;</span>a));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;c&quot;</span>), max_string(<span class="kw-2">&amp;</span>a));
+        <span class="kw">let </span>a = StringArray::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="string">"b"</span>), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">"a"</span>), <span class="prelude-val">Some</span>(<span class="string">"c"</span>)]);
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">"a"</span>), min_string(<span class="kw-2">&amp;</span>a));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">"c"</span>), max_string(<span class="kw-2">&amp;</span>a));
     }
 
     <span class="attr">#[test]
@@ -2710,9 +2710,9 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_string_min_max_1() {
-        <span class="kw">let </span>a = StringArray::from(<span class="macro">vec!</span>[<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;b&quot;</span>), <span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>)]);
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>), min_string(<span class="kw-2">&amp;</span>a));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;b&quot;</span>), max_string(<span class="kw-2">&amp;</span>a));
+        <span class="kw">let </span>a = StringArray::from(<span class="macro">vec!</span>[<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">"b"</span>), <span class="prelude-val">Some</span>(<span class="string">"a"</span>)]);
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">"a"</span>), min_string(<span class="kw-2">&amp;</span>a));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">"b"</span>), max_string(<span class="kw-2">&amp;</span>a));
     }
 
     <span class="attr">#[test]
@@ -2885,14 +2885,14 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_min_max_sliced_string() {
-        <span class="kw">let </span>expected = <span class="prelude-val">Some</span>(<span class="string">&quot;foo&quot;</span>);
-        <span class="kw">let </span>input: StringArray = <span class="macro">vec!</span>[<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;foo&quot;</span>)].into_iter().collect();
+        <span class="kw">let </span>expected = <span class="prelude-val">Some</span>(<span class="string">"foo"</span>);
+        <span class="kw">let </span>input: StringArray = <span class="macro">vec!</span>[<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">"foo"</span>)].into_iter().collect();
         <span class="kw">let </span>actual = min_string(<span class="kw-2">&amp;</span>input);
         <span class="macro">assert_eq!</span>(actual, expected);
         <span class="kw">let </span>actual = max_string(<span class="kw-2">&amp;</span>input);
         <span class="macro">assert_eq!</span>(actual, expected);
 
-        <span class="kw">let </span>sliced_input: StringArray = <span class="macro">vec!</span>[<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;foo&quot;</span>)]
+        <span class="kw">let </span>sliced_input: StringArray = <span class="macro">vec!</span>[<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">"foo"</span>)]
             .into_iter()
             .collect();
         <span class="kw">let </span>sliced_input = sliced_input.slice(<span class="number">4</span>, <span class="number">2</span>);
@@ -2928,7 +2928,7 @@
     }
 
     <span class="attr">#[test]
-    #[cfg(not(feature = <span class="string">&quot;simd&quot;</span>))]
+    #[cfg(not(feature = <span class="string">"simd"</span>))]
     </span><span class="kw">fn </span>test_sum_overflow() {
         <span class="kw">let </span>a = Int32Array::from(<span class="macro">vec!</span>[i32::MAX, <span class="number">1</span>]);
 
@@ -2940,8 +2940,8 @@
     </span><span class="kw">fn </span>test_sum_checked_overflow() {
         <span class="kw">let </span>a = Int32Array::from(<span class="macro">vec!</span>[i32::MAX, <span class="number">1</span>]);
 
-        sum_checked(<span class="kw-2">&amp;</span>a).expect_err(<span class="string">&quot;overflow should be detected&quot;</span>);
-        sum_array_checked::&lt;Int32Type, <span class="kw">_</span>&gt;(<span class="kw-2">&amp;</span>a).expect_err(<span class="string">&quot;overflow should be detected&quot;</span>);
+        sum_checked(<span class="kw-2">&amp;</span>a).expect_err(<span class="string">"overflow should be detected"</span>);
+        sum_array_checked::&lt;Int32Type, <span class="kw">_</span>&gt;(<span class="kw-2">&amp;</span>a).expect_err(<span class="string">"overflow should be detected"</span>);
     }
 }
 </code></pre></div></section></main></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-array/src/array/boolean_array.rs`."><title>boolean_array.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e6a78389201e676c.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="arrow_array" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (87e1447aa 2023-11-30)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-array/src/array/boolean_array.rs`."><title>boolean_array.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="arrow_array" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (e9013ac0e 2023-12-05)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -624,14 +624,14 @@
 // distributed with this work for additional information
 // regarding copyright ownership.  The ASF licenses this file
 // to you under the Apache License, Version 2.0 (the
-// &quot;License&quot;); you may not use this file except in compliance
+// "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
-// &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
@@ -693,11 +693,11 @@
 
 <span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>BooleanArray {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;BooleanArray\n[\n&quot;</span>)<span class="question-mark">?</span>;
+        <span class="macro">write!</span>(f, <span class="string">"BooleanArray\n[\n"</span>)<span class="question-mark">?</span>;
         print_long_array(<span class="self">self</span>, f, |array, index, f| {
             std::fmt::Debug::fmt(<span class="kw-2">&amp;</span>array.value(index), f)
         })<span class="question-mark">?</span>;
-        <span class="macro">write!</span>(f, <span class="string">&quot;]&quot;</span>)
+        <span class="macro">write!</span>(f, <span class="string">"]"</span>)
     }
 }
 
@@ -782,7 +782,7 @@
     <span class="doccomment">/// Returns the boolean value at index `i`.
     ///
     /// # Safety
-    /// This doesn&#39;t check bounds, the caller must ensure that index &lt; self.len()
+    /// This doesn't check bounds, the caller must ensure that index &lt; self.len()
     </span><span class="kw">pub unsafe fn </span>value_unchecked(<span class="kw-2">&amp;</span><span class="self">self</span>, i: usize) -&gt; bool {
         <span class="self">self</span>.values.value_unchecked(i)
     }
@@ -793,7 +793,7 @@
     </span><span class="kw">pub fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>, i: usize) -&gt; bool {
         <span class="macro">assert!</span>(
             i &lt; <span class="self">self</span>.len(),
-            <span class="string">&quot;Trying to access an element at index {} from a BooleanArray of length {}&quot;</span>,
+            <span class="string">"Trying to access an element at index {} from a BooleanArray of length {}"</span>,
             i,
             <span class="self">self</span>.len()
         );
@@ -803,10 +803,10 @@
     }
 
     <span class="doccomment">/// Returns an iterator that returns the values of `array.value(i)` for an iterator with each element `i`
-    </span><span class="kw">pub fn </span>take_iter&lt;<span class="lifetime">&#39;a</span>&gt;(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        indexes: <span class="kw">impl </span>Iterator&lt;Item = <span class="prelude-ty">Option</span>&lt;usize&gt;&gt; + <span class="lifetime">&#39;a</span>,
-    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="prelude-ty">Option</span>&lt;bool&gt;&gt; + <span class="lifetime">&#39;a </span>{
+    </span><span class="kw">pub fn </span>take_iter&lt;<span class="lifetime">'a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>,
+        indexes: <span class="kw">impl </span>Iterator&lt;Item = <span class="prelude-ty">Option</span>&lt;usize&gt;&gt; + <span class="lifetime">'a</span>,
+    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="prelude-ty">Option</span>&lt;bool&gt;&gt; + <span class="lifetime">'a </span>{
         indexes.map(|opt_index| opt_index.map(|index| <span class="self">self</span>.value(index)))
     }
 
@@ -814,10 +814,10 @@
     /// # Safety
     ///
     /// caller must ensure that the offsets in the iterator are less than the array len()
-    </span><span class="kw">pub unsafe fn </span>take_iter_unchecked&lt;<span class="lifetime">&#39;a</span>&gt;(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        indexes: <span class="kw">impl </span>Iterator&lt;Item = <span class="prelude-ty">Option</span>&lt;usize&gt;&gt; + <span class="lifetime">&#39;a</span>,
-    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="prelude-ty">Option</span>&lt;bool&gt;&gt; + <span class="lifetime">&#39;a </span>{
+    </span><span class="kw">pub unsafe fn </span>take_iter_unchecked&lt;<span class="lifetime">'a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>,
+        indexes: <span class="kw">impl </span>Iterator&lt;Item = <span class="prelude-ty">Option</span>&lt;usize&gt;&gt; + <span class="lifetime">'a</span>,
+    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="prelude-ty">Option</span>&lt;bool&gt;&gt; + <span class="lifetime">'a </span>{
         indexes.map(|opt_index| opt_index.map(|index| <span class="self">self</span>.value_unchecked(index)))
     }
 
@@ -927,7 +927,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ArrayAccessor <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BooleanArray {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; ArrayAccessor <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">'a </span>BooleanArray {
     <span class="kw">type </span>Item = bool;
 
     <span class="kw">fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; <span class="self">Self</span>::Item {
@@ -970,14 +970,14 @@
         <span class="macro">assert_eq!</span>(
             data.data_type(),
             <span class="kw-2">&amp;</span>DataType::Boolean,
-            <span class="string">&quot;BooleanArray expected ArrayData with type {} got {}&quot;</span>,
+            <span class="string">"BooleanArray expected ArrayData with type {} got {}"</span>,
             DataType::Boolean,
             data.data_type()
         );
         <span class="macro">assert_eq!</span>(
             data.buffers().len(),
             <span class="number">1</span>,
-            <span class="string">&quot;BooleanArray data should contain a single buffer only (values buffer)&quot;
+            <span class="string">"BooleanArray data should contain a single buffer only (values buffer)"
         </span>);
         <span class="kw">let </span>values = BooleanBuffer::new(data.buffers()[<span class="number">0</span>].clone(), data.offset(), data.len());
 
@@ -1000,19 +1000,19 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BooleanArray {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">'a </span>BooleanArray {
     <span class="kw">type </span>Item = <span class="prelude-ty">Option</span>&lt;bool&gt;;
-    <span class="kw">type </span>IntoIter = BooleanIter&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">type </span>IntoIter = BooleanIter&lt;<span class="lifetime">'a</span>&gt;;
 
     <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
-        BooleanIter::&lt;<span class="lifetime">&#39;a</span>&gt;::new(<span class="self">self</span>)
+        BooleanIter::&lt;<span class="lifetime">'a</span>&gt;::new(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BooleanArray {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; BooleanArray {
     <span class="doccomment">/// constructs a new iterator
-    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; BooleanIter&lt;<span class="lifetime">&#39;a</span>&gt; {
-        BooleanIter::&lt;<span class="lifetime">&#39;a</span>&gt;::new(<span class="self">self</span>)
+    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>) -&gt; BooleanIter&lt;<span class="lifetime">'a</span>&gt; {
+        BooleanIter::&lt;<span class="lifetime">'a</span>&gt;::new(<span class="self">self</span>)
     }
 }
 
@@ -1020,7 +1020,7 @@
     <span class="kw">fn </span>from_iter&lt;I: IntoIterator&lt;Item = Ptr&gt;&gt;(iter: I) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>iter = iter.into_iter();
         <span class="kw">let </span>(<span class="kw">_</span>, data_len) = iter.size_hint();
-        <span class="kw">let </span>data_len = data_len.expect(<span class="string">&quot;Iterator must be sized&quot;</span>); <span class="comment">// panic if no upper bound.
+        <span class="kw">let </span>data_len = data_len.expect(<span class="string">"Iterator must be sized"</span>); <span class="comment">// panic if no upper bound.
 
         </span><span class="kw">let </span>num_bytes = bit_util::ceil(data_len, <span class="number">8</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>null_builder = MutableBuffer::from_len_zeroed(num_bytes);
@@ -1072,8 +1072,8 @@
     </span><span class="kw">fn </span>test_boolean_fmt_debug() {
         <span class="kw">let </span>arr = BooleanArray::from(<span class="macro">vec!</span>[<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>]);
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;BooleanArray\n[\n  true,\n  false,\n  false,\n]&quot;</span>,
-            <span class="macro">format!</span>(<span class="string">&quot;{arr:?}&quot;</span>)
+            <span class="string">"BooleanArray\n[\n  true,\n  false,\n  false,\n]"</span>,
+            <span class="macro">format!</span>(<span class="string">"{arr:?}"</span>)
         );
     }
 
@@ -1085,8 +1085,8 @@
         builder.append_value(<span class="bool-val">false</span>);
         <span class="kw">let </span>arr = builder.finish();
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;BooleanArray\n[\n  true,\n  null,\n  false,\n]&quot;</span>,
-            <span class="macro">format!</span>(<span class="string">&quot;{arr:?}&quot;</span>)
+            <span class="string">"BooleanArray\n[\n  true,\n  null,\n  false,\n]"</span>,
+            <span class="macro">format!</span>(<span class="string">"{arr:?}"</span>)
         );
     }
 
@@ -1101,7 +1101,7 @@
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">4 </span>{
             <span class="macro">assert!</span>(!arr.is_null(i));
             <span class="macro">assert!</span>(arr.is_valid(i));
-            <span class="macro">assert_eq!</span>(i == <span class="number">1 </span>|| i == <span class="number">3</span>, arr.value(i), <span class="string">&quot;failed at {i}&quot;</span>)
+            <span class="macro">assert_eq!</span>(i == <span class="number">1 </span>|| i == <span class="number">3</span>, arr.value(i), <span class="string">"failed at {i}"</span>)
         }
     }
 
@@ -1120,7 +1120,7 @@
             } <span class="kw">else </span>{
                 <span class="macro">assert!</span>(!arr.is_null(i));
                 <span class="macro">assert!</span>(arr.is_valid(i));
-                <span class="macro">assert_eq!</span>(i == <span class="number">1 </span>|| i == <span class="number">3</span>, arr.value(i), <span class="string">&quot;failed at {i}&quot;</span>)
+                <span class="macro">assert_eq!</span>(i == <span class="number">1 </span>|| i == <span class="number">3</span>, arr.value(i), <span class="string">"failed at {i}"</span>)
             }
         }
     }
@@ -1136,7 +1136,7 @@
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
             <span class="macro">assert!</span>(!arr.is_null(i));
             <span class="macro">assert!</span>(arr.is_valid(i));
-            <span class="macro">assert_eq!</span>(i == <span class="number">1 </span>|| i == <span class="number">3</span>, arr.value(i), <span class="string">&quot;failed at {i}&quot;</span>)
+            <span class="macro">assert_eq!</span>(i == <span class="number">1 </span>|| i == <span class="number">3</span>, arr.value(i), <span class="string">"failed at {i}"</span>)
         }
     }
 
@@ -1176,13 +1176,13 @@
         <span class="macro">assert_eq!</span>(<span class="number">2</span>, arr.offset());
         <span class="macro">assert_eq!</span>(<span class="number">0</span>, arr.null_count());
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">3 </span>{
-            <span class="macro">assert_eq!</span>(i != <span class="number">0</span>, arr.value(i), <span class="string">&quot;failed at {i}&quot;</span>);
+            <span class="macro">assert_eq!</span>(i != <span class="number">0</span>, arr.value(i), <span class="string">"failed at {i}"</span>);
         }
     }
 
     <span class="attr">#[test]
     #[should_panic(
-        expected = <span class="string">&quot;Trying to access an element at index 4 from a BooleanArray of length 3&quot;
+        expected = <span class="string">"Trying to access an element at index 4 from a BooleanArray of length 3"
     </span>)]
     </span><span class="kw">fn </span>test_fixed_size_binary_array_get_value_index_out_of_bound() {
         <span class="kw">let </span>v = <span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="bool-val">true</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)];
@@ -1192,11 +1192,11 @@
     }
 
     <span class="attr">#[test]
-    #[should_panic(expected = <span class="string">&quot;BooleanArray data should contain a single buffer only \
-                               (values buffer)&quot;</span>)]
+    #[should_panic(expected = <span class="string">"BooleanArray data should contain a single buffer only \
+                               (values buffer)"</span>)]
     </span><span class="comment">// Different error messages, so skip for now
     // https://github.com/apache/arrow-rs/issues/1545
-    </span><span class="attr">#[cfg(not(feature = <span class="string">&quot;force_validate&quot;</span>))]
+    </span><span class="attr">#[cfg(not(feature = <span class="string">"force_validate"</span>))]
     </span><span class="kw">fn </span>test_boolean_array_invalid_buffer_len() {
         <span class="kw">let </span>data = <span class="kw">unsafe </span>{
             ArrayData::builder(DataType::Boolean)
@@ -1207,7 +1207,7 @@
     }
 
     <span class="attr">#[test]
-    #[should_panic(expected = <span class="string">&quot;BooleanArray expected ArrayData with type Boolean got Int32&quot;</span>)]
+    #[should_panic(expected = <span class="string">"BooleanArray expected ArrayData with type Boolean got Int32"</span>)]
     </span><span class="kw">fn </span>test_from_array_data_validation() {
         <span class="kw">let _ </span>= BooleanArray::from(ArrayData::new_empty(<span class="kw-2">&amp;</span>DataType::Int32));
     }

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-array/src/types.rs`."><title>types.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e6a78389201e676c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_array" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (87e1447aa 2023-11-30)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-array/src/types.rs`."><title>types.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_array" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (e9013ac0e 2023-12-05)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1572,14 +1572,14 @@
 // distributed with this work for additional information
 // regarding copyright ownership.  The ASF licenses this file
 // to you under the Apache License, Version 2.0 (the
-// &quot;License&quot;); you may not use this file except in compliance
+// "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
-// &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
@@ -1618,7 +1618,7 @@
 /// static-typed nature of rust types ([`ArrowNativeType`]) for all types that implement [`ArrowNativeType`].
 ///
 /// [`ArrowNativeType`]: arrow_buffer::ArrowNativeType
-</span><span class="kw">pub trait </span>ArrowPrimitiveType: primitive::PrimitiveTypeSealed + <span class="lifetime">&#39;static </span>{
+</span><span class="kw">pub trait </span>ArrowPrimitiveType: primitive::PrimitiveTypeSealed + <span class="lifetime">'static </span>{
     <span class="doccomment">/// Corresponding Rust native type for the primitive type.
     </span><span class="kw">type </span>Native: ArrowNativeTypeOp;
 
@@ -1657,168 +1657,168 @@
     };
 }
 
-<span class="macro">make_type!</span>(Int8Type, i8, DataType::Int8, <span class="string">&quot;A signed 8-bit integer type.&quot;</span>);
+<span class="macro">make_type!</span>(Int8Type, i8, DataType::Int8, <span class="string">"A signed 8-bit integer type."</span>);
 <span class="macro">make_type!</span>(
     Int16Type,
     i16,
     DataType::Int16,
-    <span class="string">&quot;A signed 16-bit integer type.&quot;
+    <span class="string">"A signed 16-bit integer type."
 </span>);
 <span class="macro">make_type!</span>(
     Int32Type,
     i32,
     DataType::Int32,
-    <span class="string">&quot;A signed 32-bit integer type.&quot;
+    <span class="string">"A signed 32-bit integer type."
 </span>);
 <span class="macro">make_type!</span>(
     Int64Type,
     i64,
     DataType::Int64,
-    <span class="string">&quot;A signed 64-bit integer type.&quot;
+    <span class="string">"A signed 64-bit integer type."
 </span>);
 <span class="macro">make_type!</span>(
     UInt8Type,
     u8,
     DataType::UInt8,
-    <span class="string">&quot;An unsigned 8-bit integer type.&quot;
+    <span class="string">"An unsigned 8-bit integer type."
 </span>);
 <span class="macro">make_type!</span>(
     UInt16Type,
     u16,
     DataType::UInt16,
-    <span class="string">&quot;An unsigned 16-bit integer type.&quot;
+    <span class="string">"An unsigned 16-bit integer type."
 </span>);
 <span class="macro">make_type!</span>(
     UInt32Type,
     u32,
     DataType::UInt32,
-    <span class="string">&quot;An unsigned 32-bit integer type.&quot;
+    <span class="string">"An unsigned 32-bit integer type."
 </span>);
 <span class="macro">make_type!</span>(
     UInt64Type,
     u64,
     DataType::UInt64,
-    <span class="string">&quot;An unsigned 64-bit integer type.&quot;
+    <span class="string">"An unsigned 64-bit integer type."
 </span>);
 <span class="macro">make_type!</span>(
     Float16Type,
     f16,
     DataType::Float16,
-    <span class="string">&quot;A 16-bit floating point number type.&quot;
+    <span class="string">"A 16-bit floating point number type."
 </span>);
 <span class="macro">make_type!</span>(
     Float32Type,
     f32,
     DataType::Float32,
-    <span class="string">&quot;A 32-bit floating point number type.&quot;
+    <span class="string">"A 32-bit floating point number type."
 </span>);
 <span class="macro">make_type!</span>(
     Float64Type,
     f64,
     DataType::Float64,
-    <span class="string">&quot;A 64-bit floating point number type.&quot;
+    <span class="string">"A 64-bit floating point number type."
 </span>);
 <span class="macro">make_type!</span>(
     TimestampSecondType,
     i64,
     DataType::Timestamp(TimeUnit::Second, <span class="prelude-val">None</span>),
-    <span class="string">&quot;A timestamp second type with an optional timezone.&quot;
+    <span class="string">"A timestamp second type with an optional timezone."
 </span>);
 <span class="macro">make_type!</span>(
     TimestampMillisecondType,
     i64,
     DataType::Timestamp(TimeUnit::Millisecond, <span class="prelude-val">None</span>),
-    <span class="string">&quot;A timestamp millisecond type with an optional timezone.&quot;
+    <span class="string">"A timestamp millisecond type with an optional timezone."
 </span>);
 <span class="macro">make_type!</span>(
     TimestampMicrosecondType,
     i64,
     DataType::Timestamp(TimeUnit::Microsecond, <span class="prelude-val">None</span>),
-    <span class="string">&quot;A timestamp microsecond type with an optional timezone.&quot;
+    <span class="string">"A timestamp microsecond type with an optional timezone."
 </span>);
 <span class="macro">make_type!</span>(
     TimestampNanosecondType,
     i64,
     DataType::Timestamp(TimeUnit::Nanosecond, <span class="prelude-val">None</span>),
-    <span class="string">&quot;A timestamp nanosecond type with an optional timezone.&quot;
+    <span class="string">"A timestamp nanosecond type with an optional timezone."
 </span>);
 <span class="macro">make_type!</span>(
     Date32Type,
     i32,
     DataType::Date32,
-    <span class="string">&quot;A 32-bit date type representing the elapsed time since UNIX epoch in days(32 bits).&quot;
+    <span class="string">"A 32-bit date type representing the elapsed time since UNIX epoch in days(32 bits)."
 </span>);
 <span class="macro">make_type!</span>(
     Date64Type,
     i64,
     DataType::Date64,
-    <span class="string">&quot;A 64-bit date type representing the elapsed time since UNIX epoch in milliseconds(64 bits).&quot;
+    <span class="string">"A 64-bit date type representing the elapsed time since UNIX epoch in milliseconds(64 bits)."
 </span>);
 <span class="macro">make_type!</span>(
     Time32SecondType,
     i32,
     DataType::Time32(TimeUnit::Second),
-    <span class="string">&quot;A 32-bit time type representing the elapsed time since midnight in seconds.&quot;
+    <span class="string">"A 32-bit time type representing the elapsed time since midnight in seconds."
 </span>);
 <span class="macro">make_type!</span>(
     Time32MillisecondType,
     i32,
     DataType::Time32(TimeUnit::Millisecond),
-    <span class="string">&quot;A 32-bit time type representing the elapsed time since midnight in milliseconds.&quot;
+    <span class="string">"A 32-bit time type representing the elapsed time since midnight in milliseconds."
 </span>);
 <span class="macro">make_type!</span>(
     Time64MicrosecondType,
     i64,
     DataType::Time64(TimeUnit::Microsecond),
-    <span class="string">&quot;A 64-bit time type representing the elapsed time since midnight in microseconds.&quot;
+    <span class="string">"A 64-bit time type representing the elapsed time since midnight in microseconds."
 </span>);
 <span class="macro">make_type!</span>(
     Time64NanosecondType,
     i64,
     DataType::Time64(TimeUnit::Nanosecond),
-    <span class="string">&quot;A 64-bit time type representing the elapsed time since midnight in nanoseconds.&quot;
+    <span class="string">"A 64-bit time type representing the elapsed time since midnight in nanoseconds."
 </span>);
 <span class="macro">make_type!</span>(
     IntervalYearMonthType,
     i32,
     DataType::Interval(IntervalUnit::YearMonth),
-    <span class="string">&quot;A “calendar” interval type in months.&quot;
+    <span class="string">"A “calendar” interval type in months."
 </span>);
 <span class="macro">make_type!</span>(
     IntervalDayTimeType,
     i64,
     DataType::Interval(IntervalUnit::DayTime),
-    <span class="string">&quot;A “calendar” interval type in days and milliseconds.&quot;
+    <span class="string">"A “calendar” interval type in days and milliseconds."
 </span>);
 <span class="macro">make_type!</span>(
     IntervalMonthDayNanoType,
     i128,
     DataType::Interval(IntervalUnit::MonthDayNano),
-    <span class="string">&quot;A “calendar” interval type in months, days, and nanoseconds.&quot;
+    <span class="string">"A “calendar” interval type in months, days, and nanoseconds."
 </span>);
 <span class="macro">make_type!</span>(
     DurationSecondType,
     i64,
     DataType::Duration(TimeUnit::Second),
-    <span class="string">&quot;An elapsed time type in seconds.&quot;
+    <span class="string">"An elapsed time type in seconds."
 </span>);
 <span class="macro">make_type!</span>(
     DurationMillisecondType,
     i64,
     DataType::Duration(TimeUnit::Millisecond),
-    <span class="string">&quot;An elapsed time type in milliseconds.&quot;
+    <span class="string">"An elapsed time type in milliseconds."
 </span>);
 <span class="macro">make_type!</span>(
     DurationMicrosecondType,
     i64,
     DataType::Duration(TimeUnit::Microsecond),
-    <span class="string">&quot;An elapsed time type in microseconds.&quot;
+    <span class="string">"An elapsed time type in microseconds."
 </span>);
 <span class="macro">make_type!</span>(
     DurationNanosecondType,
     i64,
     DataType::Duration(TimeUnit::Nanosecond),
-    <span class="string">&quot;An elapsed time type in nanoseconds.&quot;
+    <span class="string">"An elapsed time type in nanoseconds."
 </span>);
 
 <span class="doccomment">/// A subtype of primitive type that represents legal dictionary keys.
@@ -1879,7 +1879,7 @@
     </span><span class="kw">const </span>UNIT: TimeUnit;
 
     <span class="doccomment">/// Returns the `TimeUnit` of this timestamp.
-    </span><span class="attr">#[deprecated(note = <span class="string">&quot;Use Self::UNIT&quot;</span>)]
+    </span><span class="attr">#[deprecated(note = <span class="string">"Use Self::UNIT"</span>)]
     </span><span class="kw">fn </span>get_time_unit() -&gt; TimeUnit {
         <span class="self">Self</span>::UNIT
     }
@@ -2766,7 +2766,7 @@
 /// [`Decimal128Array`]: crate::array::Decimal128Array
 /// [`Decimal256Array`]: crate::array::Decimal256Array
 </span><span class="kw">pub trait </span>DecimalType:
-    <span class="lifetime">&#39;static </span>+ Send + Sync + ArrowPrimitiveType + decimal::DecimalTypeSealed
+    <span class="lifetime">'static </span>+ Send + Sync + ArrowPrimitiveType + decimal::DecimalTypeSealed
 {
     <span class="doccomment">/// Width of the type
     </span><span class="kw">const </span>BYTE_LENGTH: usize;
@@ -2779,8 +2779,8 @@
     <span class="doccomment">/// Default values for [`DataType`]
     </span><span class="kw">const </span>DEFAULT_TYPE: DataType;
 
-    <span class="doccomment">/// &quot;Decimal128&quot; or &quot;Decimal256&quot;, for use in error messages
-    </span><span class="kw">const </span>PREFIX: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
+    <span class="doccomment">/// "Decimal128" or "Decimal256", for use in error messages
+    </span><span class="kw">const </span>PREFIX: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str;
 
     <span class="doccomment">/// Formats the decimal value with the provided precision and scale
     </span><span class="kw">fn </span>format_decimal(value: <span class="self">Self</span>::Native, precision: u8, scale: i8) -&gt; String;
@@ -2802,27 +2802,27 @@
 ) -&gt; <span class="prelude-ty">Result</span>&lt;(), ArrowError&gt; {
     <span class="kw">if </span>precision == <span class="number">0 </span>{
         <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::InvalidArgumentError(<span class="macro">format!</span>(
-            <span class="string">&quot;precision cannot be 0, has to be between [1, {}]&quot;</span>,
+            <span class="string">"precision cannot be 0, has to be between [1, {}]"</span>,
             T::MAX_PRECISION
         )));
     }
     <span class="kw">if </span>precision &gt; T::MAX_PRECISION {
         <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::InvalidArgumentError(<span class="macro">format!</span>(
-            <span class="string">&quot;precision {} is greater than max {}&quot;</span>,
+            <span class="string">"precision {} is greater than max {}"</span>,
             precision,
             T::MAX_PRECISION
         )));
     }
     <span class="kw">if </span>scale &gt; T::MAX_SCALE {
         <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::InvalidArgumentError(<span class="macro">format!</span>(
-            <span class="string">&quot;scale {} is greater than max {}&quot;</span>,
+            <span class="string">"scale {} is greater than max {}"</span>,
             scale,
             T::MAX_SCALE
         )));
     }
     <span class="kw">if </span>scale &gt; <span class="number">0 </span>&amp;&amp; scale <span class="kw">as </span>u8 &gt; precision {
         <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::InvalidArgumentError(<span class="macro">format!</span>(
-            <span class="string">&quot;scale {scale} is greater than precision {precision}&quot;
+            <span class="string">"scale {scale} is greater than precision {precision}"
         </span>)));
     }
 
@@ -2840,7 +2840,7 @@
     <span class="kw">const </span>TYPE_CONSTRUCTOR: <span class="kw">fn</span>(u8, i8) -&gt; DataType = DataType::Decimal128;
     <span class="kw">const </span>DEFAULT_TYPE: DataType =
         DataType::Decimal128(DECIMAL128_MAX_PRECISION, DECIMAL_DEFAULT_SCALE);
-    <span class="kw">const </span>PREFIX: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Decimal128&quot;</span>;
+    <span class="kw">const </span>PREFIX: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"Decimal128"</span>;
 
     <span class="kw">fn </span>format_decimal(value: <span class="self">Self</span>::Native, precision: u8, scale: i8) -&gt; String {
         format_decimal_str(<span class="kw-2">&amp;</span>value.to_string(), precision <span class="kw">as </span>usize, scale)
@@ -2870,7 +2870,7 @@
     <span class="kw">const </span>TYPE_CONSTRUCTOR: <span class="kw">fn</span>(u8, i8) -&gt; DataType = DataType::Decimal256;
     <span class="kw">const </span>DEFAULT_TYPE: DataType =
         DataType::Decimal256(DECIMAL256_MAX_PRECISION, DECIMAL_DEFAULT_SCALE);
-    <span class="kw">const </span>PREFIX: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Decimal256&quot;</span>;
+    <span class="kw">const </span>PREFIX: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"Decimal256"</span>;
 
     <span class="kw">fn </span>format_decimal(value: <span class="self">Self</span>::Native, precision: u8, scale: i8) -&gt; String {
         format_decimal_str(<span class="kw-2">&amp;</span>value.to_string(), precision <span class="kw">as </span>usize, scale)
@@ -2890,9 +2890,9 @@
 <span class="kw">impl </span>primitive::PrimitiveTypeSealed <span class="kw">for </span>Decimal256Type {}
 
 <span class="kw">fn </span>format_decimal_str(value_str: <span class="kw-2">&amp;</span>str, precision: usize, scale: i8) -&gt; String {
-    <span class="kw">let </span>(sign, rest) = <span class="kw">match </span>value_str.strip_prefix(<span class="string">&#39;-&#39;</span>) {
-        <span class="prelude-val">Some</span>(stripped) =&gt; (<span class="string">&quot;-&quot;</span>, stripped),
-        <span class="prelude-val">None </span>=&gt; (<span class="string">&quot;&quot;</span>, value_str),
+    <span class="kw">let </span>(sign, rest) = <span class="kw">match </span>value_str.strip_prefix(<span class="string">'-'</span>) {
+        <span class="prelude-val">Some</span>(stripped) =&gt; (<span class="string">"-"</span>, stripped),
+        <span class="prelude-val">None </span>=&gt; (<span class="string">""</span>, value_str),
     };
     <span class="kw">let </span>bound = precision.min(rest.len()) + sign.len();
     <span class="kw">let </span>value_str = <span class="kw-2">&amp;</span>value_str[<span class="number">0</span>..bound];
@@ -2901,14 +2901,14 @@
         value_str.to_string()
     } <span class="kw">else if </span>scale &lt; <span class="number">0 </span>{
         <span class="kw">let </span>padding = value_str.len() + scale.unsigned_abs() <span class="kw">as </span>usize;
-        <span class="macro">format!</span>(<span class="string">&quot;{value_str:0&lt;padding$}&quot;</span>)
+        <span class="macro">format!</span>(<span class="string">"{value_str:0&lt;padding$}"</span>)
     } <span class="kw">else if </span>rest.len() &gt; scale <span class="kw">as </span>usize {
         <span class="comment">// Decimal separator is in the middle of the string
         </span><span class="kw">let </span>(whole, decimal) = value_str.split_at(value_str.len() - scale <span class="kw">as </span>usize);
-        <span class="macro">format!</span>(<span class="string">&quot;{whole}.{decimal}&quot;</span>)
+        <span class="macro">format!</span>(<span class="string">"{whole}.{decimal}"</span>)
     } <span class="kw">else </span>{
         <span class="comment">// String has to be padded
-        </span><span class="macro">format!</span>(<span class="string">&quot;{}0.{:0&gt;width$}&quot;</span>, sign, rest, width = scale <span class="kw">as </span>usize)
+        </span><span class="macro">format!</span>(<span class="string">"{}0.{:0&gt;width$}"</span>, sign, rest, width = scale <span class="kw">as </span>usize)
     }
 }
 
@@ -2947,7 +2947,7 @@
 <span class="doccomment">/// A trait over the variable-size byte array types
 ///
 /// See [Variable Size Binary Layout](https://arrow.apache.org/docs/format/Columnar.html#variable-size-binary-layout)
-</span><span class="kw">pub trait </span>ByteArrayType: <span class="lifetime">&#39;static </span>+ Send + Sync + bytes::ByteArrayTypeSealed {
+</span><span class="kw">pub trait </span>ByteArrayType: <span class="lifetime">'static </span>+ Send + Sync + bytes::ByteArrayTypeSealed {
     <span class="doccomment">/// Type of offset i.e i32/i64
     </span><span class="kw">type </span>Offset: OffsetSizeTrait;
     <span class="doccomment">/// Type for representing its equivalent rust type i.e
@@ -2955,8 +2955,8 @@
     /// BinaryArray will have type as [u8]
     </span><span class="kw">type </span>Native: bytes::ByteArrayNativeType + AsRef&lt;<span class="self">Self</span>::Native&gt; + AsRef&lt;[u8]&gt; + <span class="question-mark">?</span>Sized;
 
-    <span class="doccomment">/// &quot;Binary&quot; or &quot;String&quot;, for use in error messages
-    </span><span class="kw">const </span>PREFIX: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
+    <span class="doccomment">/// "Binary" or "String", for use in error messages
+    </span><span class="kw">const </span>PREFIX: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str;
 
     <span class="doccomment">/// Datatype of array elements
     </span><span class="kw">const </span>DATA_TYPE: DataType;
@@ -2973,7 +2973,7 @@
 <span class="kw">impl</span>&lt;O: OffsetSizeTrait&gt; ByteArrayType <span class="kw">for </span>GenericStringType&lt;O&gt; {
     <span class="kw">type </span>Offset = O;
     <span class="kw">type </span>Native = str;
-    <span class="kw">const </span>PREFIX: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;String&quot;</span>;
+    <span class="kw">const </span>PREFIX: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"String"</span>;
 
     <span class="kw">const </span>DATA_TYPE: DataType = <span class="kw">if </span>O::IS_LARGE {
         DataType::LargeUtf8
@@ -2984,7 +2984,7 @@
     <span class="kw">fn </span>validate(offsets: <span class="kw-2">&amp;</span>OffsetBuffer&lt;<span class="self">Self</span>::Offset&gt;, values: <span class="kw-2">&amp;</span>Buffer) -&gt; <span class="prelude-ty">Result</span>&lt;(), ArrowError&gt; {
         <span class="comment">// Verify that the slice as a whole is valid UTF-8
         </span><span class="kw">let </span>validated = std::str::from_utf8(values).map_err(|e| {
-            ArrowError::InvalidArgumentError(<span class="macro">format!</span>(<span class="string">&quot;Encountered non UTF-8 data: {e}&quot;</span>))
+            ArrowError::InvalidArgumentError(<span class="macro">format!</span>(<span class="string">"Encountered non UTF-8 data: {e}"</span>))
         })<span class="question-mark">?</span>;
 
         <span class="comment">// Verify each offset is at a valid character boundary in this UTF-8 array
@@ -2993,11 +2993,11 @@
             <span class="kw">if </span>!validated.is_char_boundary(o) {
                 <span class="kw">if </span>o &lt; validated.len() {
                     <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::InvalidArgumentError(<span class="macro">format!</span>(
-                        <span class="string">&quot;Split UTF-8 codepoint at offset {o}&quot;
+                        <span class="string">"Split UTF-8 codepoint at offset {o}"
                     </span>)));
                 }
                 <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::InvalidArgumentError(<span class="macro">format!</span>(
-                    <span class="string">&quot;Offset of {o} exceeds length of values {}&quot;</span>,
+                    <span class="string">"Offset of {o} exceeds length of values {}"</span>,
                     validated.len()
                 )));
             }
@@ -3019,7 +3019,7 @@
 <span class="kw">impl</span>&lt;O: OffsetSizeTrait&gt; ByteArrayType <span class="kw">for </span>GenericBinaryType&lt;O&gt; {
     <span class="kw">type </span>Offset = O;
     <span class="kw">type </span>Native = [u8];
-    <span class="kw">const </span>PREFIX: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;Binary&quot;</span>;
+    <span class="kw">const </span>PREFIX: <span class="kw-2">&amp;</span><span class="lifetime">'static </span>str = <span class="string">"Binary"</span>;
 
     <span class="kw">const </span>DATA_TYPE: DataType = <span class="kw">if </span>O::IS_LARGE {
         DataType::LargeBinary
@@ -3032,7 +3032,7 @@
         </span><span class="kw">let </span>max_offset = offsets.last().unwrap().as_usize();
         <span class="kw">if </span>values.len() &lt; max_offset {
             <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::InvalidArgumentError(<span class="macro">format!</span>(
-                <span class="string">&quot;Maximum offset of {max_offset} is larger than values of length {}&quot;</span>,
+                <span class="string">"Maximum offset of {max_offset} is larger than values of length {}"</span>,
                 values.len()
             )));
         }
