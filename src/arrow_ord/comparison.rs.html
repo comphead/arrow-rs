@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-ord/src/comparison.rs`."><title>comparison.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_ord" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (1fdfe1234 2023-12-06)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-ord/src/comparison.rs`."><title>comparison.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e883e87179a81222.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_ord" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (21cce21d8 2023-12-11)" data-channel="nightly" data-search-js="search-2da88d4fc6a75ee8.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-bc37acceda91d44a.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -4589,6 +4589,45 @@
 <a href="#4589" id="4589">4589</a>
 <a href="#4590" id="4590">4590</a>
 <a href="#4591" id="4591">4591</a>
+<a href="#4592" id="4592">4592</a>
+<a href="#4593" id="4593">4593</a>
+<a href="#4594" id="4594">4594</a>
+<a href="#4595" id="4595">4595</a>
+<a href="#4596" id="4596">4596</a>
+<a href="#4597" id="4597">4597</a>
+<a href="#4598" id="4598">4598</a>
+<a href="#4599" id="4599">4599</a>
+<a href="#4600" id="4600">4600</a>
+<a href="#4601" id="4601">4601</a>
+<a href="#4602" id="4602">4602</a>
+<a href="#4603" id="4603">4603</a>
+<a href="#4604" id="4604">4604</a>
+<a href="#4605" id="4605">4605</a>
+<a href="#4606" id="4606">4606</a>
+<a href="#4607" id="4607">4607</a>
+<a href="#4608" id="4608">4608</a>
+<a href="#4609" id="4609">4609</a>
+<a href="#4610" id="4610">4610</a>
+<a href="#4611" id="4611">4611</a>
+<a href="#4612" id="4612">4612</a>
+<a href="#4613" id="4613">4613</a>
+<a href="#4614" id="4614">4614</a>
+<a href="#4615" id="4615">4615</a>
+<a href="#4616" id="4616">4616</a>
+<a href="#4617" id="4617">4617</a>
+<a href="#4618" id="4618">4618</a>
+<a href="#4619" id="4619">4619</a>
+<a href="#4620" id="4620">4620</a>
+<a href="#4621" id="4621">4621</a>
+<a href="#4622" id="4622">4622</a>
+<a href="#4623" id="4623">4623</a>
+<a href="#4624" id="4624">4624</a>
+<a href="#4625" id="4625">4625</a>
+<a href="#4626" id="4626">4626</a>
+<a href="#4627" id="4627">4627</a>
+<a href="#4628" id="4628">4628</a>
+<a href="#4629" id="4629">4629</a>
+<a href="#4630" id="4630">4630</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -4832,64 +4871,6 @@
             <span class="string">"Unsupported utf8 scalar data type {d:?}"</span>,
         ))),
     }
-}
-
-<span class="doccomment">/// Helper function to perform boolean lambda function on values from two array accessors, this
-/// version does not attempt to use SIMD.
-</span><span class="kw">fn </span>compare_op&lt;T: ArrayAccessor, S: ArrayAccessor, F&gt;(
-    left: T,
-    right: S,
-    op: F,
-) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt;
-<span class="kw">where
-    </span>F: Fn(T::Item, S::Item) -&gt; bool,
-{
-    <span class="kw">if </span>left.len() != right.len() {
-        <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ComputeError(
-            <span class="string">"Cannot perform comparison operation on arrays of different length"</span>.to_string(),
-        ));
-    }
-
-    <span class="prelude-val">Ok</span>(BooleanArray::from_binary(left, right, op))
-}
-
-<span class="doccomment">/// Helper function to perform boolean lambda function on values from array accessor, this
-/// version does not attempt to use SIMD.
-</span><span class="kw">fn </span>compare_op_scalar&lt;T: ArrayAccessor, F&gt;(left: T, op: F) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt;
-<span class="kw">where
-    </span>F: Fn(T::Item) -&gt; bool,
-{
-    <span class="prelude-val">Ok</span>(BooleanArray::from_unary(left, op))
-}
-
-<span class="doccomment">/// Evaluate `op(left, right)` for [`PrimitiveArray`]s using a specified
-/// comparison function.
-</span><span class="attr">#[deprecated(note = <span class="string">"Use BooleanArray::from_binary"</span>)]
-</span><span class="kw">pub fn </span>no_simd_compare_op&lt;T, F&gt;(
-    left: <span class="kw-2">&amp;</span>PrimitiveArray&lt;T&gt;,
-    right: <span class="kw-2">&amp;</span>PrimitiveArray&lt;T&gt;,
-    op: F,
-) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt;
-<span class="kw">where
-    </span>T: ArrowPrimitiveType,
-    F: Fn(T::Native, T::Native) -&gt; bool,
-{
-    compare_op(left, right, op)
-}
-
-<span class="doccomment">/// Evaluate `op(left, right)` for [`PrimitiveArray`] and scalar using
-/// a specified comparison function.
-</span><span class="attr">#[deprecated(note = <span class="string">"Use BooleanArray::from_unary"</span>)]
-</span><span class="kw">pub fn </span>no_simd_compare_op_scalar&lt;T, F&gt;(
-    left: <span class="kw-2">&amp;</span>PrimitiveArray&lt;T&gt;,
-    right: T::Native,
-    op: F,
-) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt;
-<span class="kw">where
-    </span>T: ArrowPrimitiveType,
-    F: Fn(T::Native, T::Native) -&gt; bool,
-{
-    compare_op_scalar(left, |l| op(l, right))
 }
 
 <span class="doccomment">/// Perform `left == right` operation on [`StringArray`] / [`LargeStringArray`].
@@ -5201,7 +5182,6 @@
 <span class="doccomment">/// Perform `left == right` operation on an array and a numeric scalar
 /// value. Supports PrimitiveArrays, and DictionaryArrays that have primitive values.
 ///
-/// If `simd` feature flag is not enabled:
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros are different. If it is necessary
@@ -5219,7 +5199,6 @@
 <span class="doccomment">/// Perform `left &lt; right` operation on an array and a numeric scalar
 /// value. Supports PrimitiveArrays, and DictionaryArrays that have primitive values.
 ///
-/// If `simd` feature flag is not enabled:
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros are different. If it is necessary
@@ -5237,7 +5216,6 @@
 <span class="doccomment">/// Perform `left &lt;= right` operation on an array and a numeric scalar
 /// value. Supports PrimitiveArrays, and DictionaryArrays that have primitive values.
 ///
-/// If `simd` feature flag is not enabled:
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros are different. If it is necessary
@@ -5255,7 +5233,6 @@
 <span class="doccomment">/// Perform `left &gt; right` operation on an array and a numeric scalar
 /// value. Supports PrimitiveArrays, and DictionaryArrays that have primitive values.
 ///
-/// If `simd` feature flag is not enabled:
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros are different. If it is necessary
@@ -5273,7 +5250,6 @@
 <span class="doccomment">/// Perform `left &gt;= right` operation on an array and a numeric scalar
 /// value. Supports PrimitiveArrays, and DictionaryArrays that have primitive values.
 ///
-/// If `simd` feature flag is not enabled:
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros are different. If it is necessary
@@ -5291,7 +5267,6 @@
 <span class="doccomment">/// Perform `left != right` operation on an array and a numeric scalar
 /// value. Supports PrimitiveArrays, and DictionaryArrays that have primitive values.
 ///
-/// If `simd` feature flag is not enabled:
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros are different. If it is necessary
@@ -5606,7 +5581,6 @@
 
 <span class="doccomment">/// Perform `left == right` operation on two [`PrimitiveArray`]s.
 ///
-/// If `simd` feature flag is not enabled:
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros are different. If it is necessary
@@ -5642,17 +5616,17 @@
 }
 
 <span class="doccomment">/// Applies an unary and infallible comparison function to a primitive array.
+</span><span class="attr">#[deprecated(note = <span class="string">"Use BooleanArray::from_unary"</span>)]
 </span><span class="kw">pub fn </span>unary_cmp&lt;T, F&gt;(left: <span class="kw-2">&amp;</span>PrimitiveArray&lt;T&gt;, op: F) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt;
 <span class="kw">where
     </span>T: ArrowNumericType,
     F: Fn(T::Native) -&gt; bool,
 {
-    compare_op_scalar(left, op)
+    <span class="prelude-val">Ok</span>(BooleanArray::from_unary(left, op))
 }
 
 <span class="doccomment">/// Perform `left != right` operation on two [`PrimitiveArray`]s.
 ///
-/// If `simd` feature flag is not enabled:
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros are different. If it is necessary
@@ -5672,7 +5646,6 @@
 
 <span class="doccomment">/// Perform `left != right` operation on a [`PrimitiveArray`] and a scalar value.
 ///
-/// If `simd` feature flag is not enabled:
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros are different. If it is necessary
@@ -5691,7 +5664,6 @@
 <span class="doccomment">/// Perform `left &lt; right` operation on two [`PrimitiveArray`]s. Null values are less than non-null
 /// values.
 ///
-/// If `simd` feature flag is not enabled:
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros are different. If it is necessary
@@ -5712,7 +5684,6 @@
 <span class="doccomment">/// Perform `left &lt; right` operation on a [`PrimitiveArray`] and a scalar value.
 /// Null values are less than non-null values.
 ///
-/// If `simd` feature flag is not enabled:
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros are different. If it is necessary
@@ -5731,7 +5702,6 @@
 <span class="doccomment">/// Perform `left &lt;= right` operation on two [`PrimitiveArray`]s. Null values are less than non-null
 /// values.
 ///
-/// If `simd` feature flag is not enabled:
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros are different. If it is necessary
@@ -5752,7 +5722,6 @@
 <span class="doccomment">/// Perform `left &lt;= right` operation on a [`PrimitiveArray`] and a scalar value.
 /// Null values are less than non-null values.
 ///
-/// If `simd` feature flag is not enabled:
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros are different. If it is necessary
@@ -5774,7 +5743,6 @@
 <span class="doccomment">/// Perform `left &gt; right` operation on two [`PrimitiveArray`]s. Non-null values are greater than null
 /// values.
 ///
-/// If `simd` feature flag is not enabled:
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros are different. If it is necessary
@@ -5795,7 +5763,6 @@
 <span class="doccomment">/// Perform `left &gt; right` operation on a [`PrimitiveArray`] and a scalar value.
 /// Non-null values are greater than null values.
 ///
-/// If `simd` feature flag is not enabled:
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros are different. If it is necessary
@@ -5814,7 +5781,6 @@
 <span class="doccomment">/// Perform `left &gt;= right` operation on two [`PrimitiveArray`]s. Non-null values are greater than null
 /// values.
 ///
-/// If `simd` feature flag is not enabled:
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros are different. If it is necessary
@@ -5835,7 +5801,6 @@
 <span class="doccomment">/// Perform `left &gt;= right` operation on a [`PrimitiveArray`] and a scalar value.
 /// Non-null values are greater than null values.
 ///
-/// If `simd` feature flag is not enabled:
 /// For floating values like f32 and f64, this comparison produces an ordering in accordance to
 /// the totalOrder predicate as defined in the IEEE 754 (2008 revision) floating point standard.
 /// Note that totalOrder treats positive and negative zeros are different. If it is necessary
@@ -6071,6 +6036,48 @@
             <span class="macro">vec!</span>[<span class="number">8</span>, <span class="number">8</span>, <span class="number">8</span>, <span class="number">8</span>, <span class="number">8</span>, <span class="number">8</span>, <span class="number">8</span>, <span class="number">8</span>, <span class="number">8</span>, <span class="number">8</span>],
             <span class="macro">vec!</span>[<span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>],
             <span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>]
+        );
+
+        <span class="macro">cmp_vec!</span>(
+            eq,
+            eq_dyn,
+            IntervalYearMonthArray,
+            <span class="macro">vec!</span>[
+                IntervalYearMonthType::make_value(<span class="number">1</span>, <span class="number">2</span>),
+                IntervalYearMonthType::make_value(<span class="number">2</span>, <span class="number">1</span>),
+                <span class="comment">// 1 year
+                </span>IntervalYearMonthType::make_value(<span class="number">1</span>, <span class="number">0</span>),
+            ],
+            <span class="macro">vec!</span>[
+                IntervalYearMonthType::make_value(<span class="number">1</span>, <span class="number">2</span>),
+                IntervalYearMonthType::make_value(<span class="number">1</span>, <span class="number">2</span>),
+                <span class="comment">// NB 12 months is treated as equal to a year (as the underlying
+                // type stores number of months)
+                </span>IntervalYearMonthType::make_value(<span class="number">0</span>, <span class="number">12</span>),
+            ],
+            <span class="macro">vec!</span>[<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>]
+        );
+
+        <span class="macro">cmp_vec!</span>(
+            eq,
+            eq_dyn,
+            IntervalMonthDayNanoArray,
+            <span class="macro">vec!</span>[
+                IntervalMonthDayNanoType::make_value(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>),
+                IntervalMonthDayNanoType::make_value(<span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>),
+                <span class="comment">// 1 month
+                </span>IntervalMonthDayNanoType::make_value(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>),
+                IntervalMonthDayNanoType::make_value(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>),
+            ],
+            <span class="macro">vec!</span>[
+                IntervalMonthDayNanoType::make_value(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>),
+                IntervalMonthDayNanoType::make_value(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>),
+                <span class="comment">// 30 days is not treated as a month
+                </span>IntervalMonthDayNanoType::make_value(<span class="number">0</span>, <span class="number">30</span>, <span class="number">0</span>),
+                <span class="comment">// 100 days
+                </span>IntervalMonthDayNanoType::make_value(<span class="number">0</span>, <span class="number">100</span>, <span class="number">0</span>),
+            ],
+            <span class="macro">vec!</span>[<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>]
         );
     }
 
@@ -6324,6 +6331,77 @@
             <span class="macro">vec!</span>[<span class="number">8</span>, <span class="number">8</span>, <span class="number">8</span>, <span class="number">8</span>, <span class="number">8</span>, <span class="number">8</span>, <span class="number">8</span>, <span class="number">8</span>, <span class="number">8</span>, <span class="number">8</span>],
             <span class="macro">vec!</span>[<span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>],
             <span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>]
+        );
+
+        <span class="macro">cmp_vec!</span>(
+            lt,
+            lt_dyn,
+            IntervalDayTimeArray,
+            <span class="macro">vec!</span>[
+                IntervalDayTimeType::make_value(<span class="number">1</span>, <span class="number">0</span>),
+                IntervalDayTimeType::make_value(<span class="number">0</span>, <span class="number">1000</span>),
+                IntervalDayTimeType::make_value(<span class="number">1</span>, <span class="number">1000</span>),
+                IntervalDayTimeType::make_value(<span class="number">1</span>, <span class="number">3000</span>),
+                <span class="comment">// 90M milliseconds
+                </span>IntervalDayTimeType::make_value(<span class="number">0</span>, <span class="number">90_000_000</span>),
+            ],
+            <span class="macro">vec!</span>[
+                IntervalDayTimeType::make_value(<span class="number">0</span>, <span class="number">1000</span>),
+                IntervalDayTimeType::make_value(<span class="number">1</span>, <span class="number">0</span>),
+                IntervalDayTimeType::make_value(<span class="number">10</span>, <span class="number">0</span>),
+                IntervalDayTimeType::make_value(<span class="number">2</span>, <span class="number">1</span>),
+                <span class="comment">// NB even though 1 day is less than 90M milliseconds long,
+                // it compares as greater because the underlying type stores
+                // days and milliseconds as different fields
+                </span>IntervalDayTimeType::make_value(<span class="number">0</span>, <span class="number">12</span>),
+            ],
+            <span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true </span>,<span class="bool-val">false</span>]
+        );
+
+        <span class="macro">cmp_vec!</span>(
+            lt,
+            lt_dyn,
+            IntervalYearMonthArray,
+            <span class="macro">vec!</span>[
+                IntervalYearMonthType::make_value(<span class="number">1</span>, <span class="number">2</span>),
+                IntervalYearMonthType::make_value(<span class="number">2</span>, <span class="number">1</span>),
+                IntervalYearMonthType::make_value(<span class="number">1</span>, <span class="number">2</span>),
+                <span class="comment">// 1 year
+                </span>IntervalYearMonthType::make_value(<span class="number">1</span>, <span class="number">0</span>),
+            ],
+            <span class="macro">vec!</span>[
+                IntervalYearMonthType::make_value(<span class="number">1</span>, <span class="number">2</span>),
+                IntervalYearMonthType::make_value(<span class="number">1</span>, <span class="number">2</span>),
+                IntervalYearMonthType::make_value(<span class="number">2</span>, <span class="number">1</span>),
+                <span class="comment">// NB 12 months is treated as equal to a year (as the underlying
+                // type stores number of months)
+                </span>IntervalYearMonthType::make_value(<span class="number">0</span>, <span class="number">12</span>),
+            ],
+            <span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>]
+        );
+
+        <span class="macro">cmp_vec!</span>(
+            lt,
+            lt_dyn,
+            IntervalMonthDayNanoArray,
+            <span class="macro">vec!</span>[
+                IntervalMonthDayNanoType::make_value(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>),
+                IntervalMonthDayNanoType::make_value(<span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>),
+                <span class="comment">// 1 month
+                </span>IntervalMonthDayNanoType::make_value(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>),
+                IntervalMonthDayNanoType::make_value(<span class="number">1</span>, <span class="number">2</span>, <span class="number">0</span>),
+                IntervalMonthDayNanoType::make_value(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>),
+            ],
+            <span class="macro">vec!</span>[
+                IntervalMonthDayNanoType::make_value(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>),
+                IntervalMonthDayNanoType::make_value(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>),
+                IntervalMonthDayNanoType::make_value(<span class="number">2</span>, <span class="number">0</span>, <span class="number">0</span>),
+                <span class="comment">// 30 days is not treated as a month
+                </span>IntervalMonthDayNanoType::make_value(<span class="number">0</span>, <span class="number">30</span>, <span class="number">0</span>),
+                <span class="comment">// 100 days (note is treated as greater than 1 month as the underlying integer representation)
+                </span>IntervalMonthDayNanoType::make_value(<span class="number">0</span>, <span class="number">100</span>, <span class="number">0</span>),
+            ],
+            <span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>]
         );
     }
 

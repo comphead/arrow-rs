@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/arrow/buffer/offset_buffer.rs`."><title>offset_buffer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (1fdfe1234 2023-12-06)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/arrow/buffer/offset_buffer.rs`."><title>offset_buffer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e883e87179a81222.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (21cce21d8 2023-12-11)" data-channel="nightly" data-search-js="search-2da88d4fc6a75ee8.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-bc37acceda91d44a.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -356,6 +356,7 @@
 <a href="#356" id="356">356</a>
 <a href="#357" id="357">357</a>
 <a href="#358" id="358">358</a>
+<a href="#359" id="359">359</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -374,7 +375,7 @@
 // under the License.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::arrow::buffer::bit_util::iter_set_bits_rev;
-<span class="kw">use </span><span class="kw">crate</span>::arrow::record_reader::buffer::{BufferQueue, ScalarBuffer, ScalarValue, ValuesBuffer};
+<span class="kw">use </span><span class="kw">crate</span>::arrow::record_reader::buffer::{BufferQueue, ValuesBuffer};
 <span class="kw">use </span><span class="kw">crate</span>::column::reader::decoder::ValuesBufferSlice;
 <span class="kw">use </span><span class="kw">crate</span>::errors::{ParquetError, <span class="prelude-ty">Result</span>};
 <span class="kw">use </span>arrow_array::{make_array, ArrayRef, OffsetSizeTrait};
@@ -385,23 +386,23 @@
 <span class="doccomment">/// A buffer of variable-sized byte arrays that can be converted into
 /// a corresponding [`ArrayRef`]
 </span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>OffsetBuffer&lt;I: ScalarValue&gt; {
-    <span class="kw">pub </span>offsets: ScalarBuffer&lt;I&gt;,
-    <span class="kw">pub </span>values: ScalarBuffer&lt;u8&gt;,
+</span><span class="kw">pub struct </span>OffsetBuffer&lt;I: OffsetSizeTrait&gt; {
+    <span class="kw">pub </span>offsets: Vec&lt;I&gt;,
+    <span class="kw">pub </span>values: Vec&lt;u8&gt;,
 }
 
-<span class="kw">impl</span>&lt;I: ScalarValue&gt; Default <span class="kw">for </span>OffsetBuffer&lt;I&gt; {
+<span class="kw">impl</span>&lt;I: OffsetSizeTrait&gt; Default <span class="kw">for </span>OffsetBuffer&lt;I&gt; {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>offsets = ScalarBuffer::new();
-        offsets.resize(<span class="number">1</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>offsets = Vec::new();
+        offsets.resize(<span class="number">1</span>, I::default());
         <span class="self">Self </span>{
             offsets,
-            values: ScalarBuffer::new(),
+            values: Vec::new(),
         }
     }
 }
 
-<span class="kw">impl</span>&lt;I: OffsetSizeTrait + ScalarValue&gt; OffsetBuffer&lt;I&gt; {
+<span class="kw">impl</span>&lt;I: OffsetSizeTrait&gt; OffsetBuffer&lt;I&gt; {
     <span class="doccomment">/// Returns the number of byte arrays in this buffer
     </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.offsets.len() - <span class="number">1
@@ -486,8 +487,8 @@
     </span><span class="kw">pub fn </span>into_array(<span class="self">self</span>, null_buffer: <span class="prelude-ty">Option</span>&lt;Buffer&gt;, data_type: ArrowType) -&gt; ArrayRef {
         <span class="kw">let </span>array_data_builder = ArrayDataBuilder::new(data_type)
             .len(<span class="self">self</span>.len())
-            .add_buffer(<span class="self">self</span>.offsets.into())
-            .add_buffer(<span class="self">self</span>.values.into())
+            .add_buffer(Buffer::from_vec(<span class="self">self</span>.offsets))
+            .add_buffer(Buffer::from_vec(<span class="self">self</span>.values))
             .null_bit_buffer(null_buffer);
 
         <span class="kw">let </span>data = <span class="kw">match </span><span class="macro">cfg!</span>(debug_assertions) {
@@ -499,7 +500,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;I: OffsetSizeTrait + ScalarValue&gt; BufferQueue <span class="kw">for </span>OffsetBuffer&lt;I&gt; {
+<span class="kw">impl</span>&lt;I: OffsetSizeTrait&gt; BufferQueue <span class="kw">for </span>OffsetBuffer&lt;I&gt; {
     <span class="kw">type </span>Output = <span class="self">Self</span>;
     <span class="kw">type </span>Slice = <span class="self">Self</span>;
 
@@ -507,16 +508,16 @@
         std::mem::take(<span class="self">self</span>)
     }
 
-    <span class="kw">fn </span>spare_capacity_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _batch_size: usize) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Slice {
+    <span class="kw">fn </span>get_output_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _batch_size: usize) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Slice {
         <span class="self">self
     </span>}
 
-    <span class="kw">fn </span>set_len(<span class="kw-2">&amp;mut </span><span class="self">self</span>, len: usize) {
+    <span class="kw">fn </span>truncate_buffer(<span class="kw-2">&amp;mut </span><span class="self">self</span>, len: usize) {
         <span class="macro">assert_eq!</span>(<span class="self">self</span>.offsets.len(), len + <span class="number">1</span>);
     }
 }
 
-<span class="kw">impl</span>&lt;I: OffsetSizeTrait + ScalarValue&gt; ValuesBuffer <span class="kw">for </span>OffsetBuffer&lt;I&gt; {
+<span class="kw">impl</span>&lt;I: OffsetSizeTrait&gt; ValuesBuffer <span class="kw">for </span>OffsetBuffer&lt;I&gt; {
     <span class="kw">fn </span>pad_nulls(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         read_offset: usize,
@@ -525,9 +526,10 @@
         valid_mask: <span class="kw-2">&amp;</span>[u8],
     ) {
         <span class="macro">assert_eq!</span>(<span class="self">self</span>.offsets.len(), read_offset + values_read + <span class="number">1</span>);
-        <span class="self">self</span>.offsets.resize(read_offset + levels_read + <span class="number">1</span>);
+        <span class="self">self</span>.offsets
+            .resize(read_offset + levels_read + <span class="number">1</span>, I::default());
 
-        <span class="kw">let </span>offsets = <span class="self">self</span>.offsets.as_slice_mut();
+        <span class="kw">let </span>offsets = <span class="kw-2">&amp;mut </span><span class="self">self</span>.offsets;
 
         <span class="kw">let </span><span class="kw-2">mut </span>last_pos = read_offset + levels_read + <span class="number">1</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>last_start_offset = I::from_usize(<span class="self">self</span>.values.len()).unwrap();
@@ -565,7 +567,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;I: ScalarValue&gt; ValuesBufferSlice <span class="kw">for </span>OffsetBuffer&lt;I&gt; {
+<span class="kw">impl</span>&lt;I: OffsetSizeTrait&gt; ValuesBufferSlice <span class="kw">for </span>OffsetBuffer&lt;I&gt; {
     <span class="kw">fn </span>capacity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         usize::MAX
     }

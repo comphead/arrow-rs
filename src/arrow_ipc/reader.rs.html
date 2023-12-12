@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-ipc/src/reader.rs`."><title>reader.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_ipc" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (1fdfe1234 2023-12-06)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-ipc/src/reader.rs`."><title>reader.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-e883e87179a81222.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_ipc" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (21cce21d8 2023-12-11)" data-channel="nightly" data-search-js="search-2da88d4fc6a75ee8.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../static.files/storage-bc37acceda91d44a.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1623,31 +1623,6 @@
 <a href="#1623" id="1623">1623</a>
 <a href="#1624" id="1624">1624</a>
 <a href="#1625" id="1625">1625</a>
-<a href="#1626" id="1626">1626</a>
-<a href="#1627" id="1627">1627</a>
-<a href="#1628" id="1628">1628</a>
-<a href="#1629" id="1629">1629</a>
-<a href="#1630" id="1630">1630</a>
-<a href="#1631" id="1631">1631</a>
-<a href="#1632" id="1632">1632</a>
-<a href="#1633" id="1633">1633</a>
-<a href="#1634" id="1634">1634</a>
-<a href="#1635" id="1635">1635</a>
-<a href="#1636" id="1636">1636</a>
-<a href="#1637" id="1637">1637</a>
-<a href="#1638" id="1638">1638</a>
-<a href="#1639" id="1639">1639</a>
-<a href="#1640" id="1640">1640</a>
-<a href="#1641" id="1641">1641</a>
-<a href="#1642" id="1642">1642</a>
-<a href="#1643" id="1643">1643</a>
-<a href="#1644" id="1644">1644</a>
-<a href="#1645" id="1645">1645</a>
-<a href="#1646" id="1646">1646</a>
-<a href="#1647" id="1647">1647</a>
-<a href="#1648" id="1648">1648</a>
-<a href="#1649" id="1649">1649</a>
-<a href="#1650" id="1650">1650</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1677,12 +1652,12 @@
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>arrow_array::<span class="kw-2">*</span>;
-<span class="kw">use </span>arrow_buffer::{Buffer, MutableBuffer};
+<span class="kw">use </span>arrow_buffer::{ArrowNativeType, Buffer, MutableBuffer};
 <span class="kw">use </span>arrow_data::ArrayData;
 <span class="kw">use </span>arrow_schema::<span class="kw-2">*</span>;
 
 <span class="kw">use </span><span class="kw">crate</span>::compression::CompressionCodec;
-<span class="kw">use crate</span>::{FieldNode, MetadataVersion, CONTINUATION_MARKER};
+<span class="kw">use crate</span>::{Block, FieldNode, Message, MetadataVersion, CONTINUATION_MARKER};
 <span class="kw">use </span>DataType::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Read a buffer based on offset and length
@@ -2148,10 +2123,34 @@
     <span class="prelude-val">Ok</span>(())
 }
 
+<span class="doccomment">/// Read the data for a given block
+</span><span class="kw">fn </span>read_block&lt;R: Read + Seek&gt;(<span class="kw-2">mut </span>reader: R, block: <span class="kw-2">&amp;</span>Block) -&gt; <span class="prelude-ty">Result</span>&lt;Buffer, ArrowError&gt; {
+    reader.seek(SeekFrom::Start(block.offset() <span class="kw">as </span>u64))<span class="question-mark">?</span>;
+    <span class="kw">let </span>body_len = block.bodyLength().to_usize().unwrap();
+    <span class="kw">let </span>metadata_len = block.metaDataLength().to_usize().unwrap();
+    <span class="kw">let </span>total_len = body_len.checked_add(metadata_len).unwrap();
+
+    <span class="kw">let </span><span class="kw-2">mut </span>buf = MutableBuffer::from_len_zeroed(total_len);
+    reader.read_exact(<span class="kw-2">&amp;mut </span>buf)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(buf.into())
+}
+
+<span class="doccomment">/// Parse an encapsulated message
+///
+/// &lt;https://arrow.apache.org/docs/format/Columnar.html#encapsulated-message-format&gt;
+</span><span class="kw">fn </span>parse_message(buf: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Message, ArrowError&gt; {
+    <span class="kw">let </span>buf = <span class="kw">match </span>buf[..<span class="number">4</span>] == CONTINUATION_MARKER {
+        <span class="bool-val">true </span>=&gt; <span class="kw-2">&amp;</span>buf[<span class="number">8</span>..],
+        <span class="bool-val">false </span>=&gt; <span class="kw-2">&amp;</span>buf[<span class="number">4</span>..],
+    };
+    <span class="kw">crate</span>::root_as_message(buf)
+        .map_err(|err| ArrowError::ParseError(<span class="macro">format!</span>(<span class="string">"Unable to get root as message: {err:?}"</span>)))
+}
+
 <span class="doccomment">/// Arrow File reader
 </span><span class="kw">pub struct </span>FileReader&lt;R: Read + Seek&gt; {
     <span class="doccomment">/// Buffered file reader that supports reading and seeking
-    </span>reader: BufReader&lt;R&gt;,
+    </span>reader: R,
 
     <span class="doccomment">/// The schema that is read from the file header
     </span>schema: SchemaRef,
@@ -2185,7 +2184,6 @@
 <span class="kw">impl</span>&lt;R: Read + Seek&gt; fmt::Debug <span class="kw">for </span>FileReader&lt;R&gt; {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::result::Result&lt;(), fmt::Error&gt; {
         f.debug_struct(<span class="string">"FileReader&lt;R&gt;"</span>)
-            .field(<span class="string">"reader"</span>, <span class="kw-2">&amp;</span><span class="string">"BufReader&lt;..&gt;"</span>)
             .field(<span class="string">"schema"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.schema)
             .field(<span class="string">"blocks"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.blocks)
             .field(<span class="string">"current_block"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.current_block)
@@ -2193,37 +2191,28 @@
             .field(<span class="string">"dictionaries_by_id"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.dictionaries_by_id)
             .field(<span class="string">"metadata_version"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.metadata_version)
             .field(<span class="string">"projection"</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.projection)
-            .finish()
+            .finish_non_exhaustive()
     }
 }
 
 <span class="kw">impl</span>&lt;R: Read + Seek&gt; FileReader&lt;R&gt; {
     <span class="doccomment">/// Try to create a new file reader
     ///
-    /// Returns errors if the file does not meet the Arrow Format header and footer
-    /// requirements
-    </span><span class="kw">pub fn </span>try_new(reader: R, projection: <span class="prelude-ty">Option</span>&lt;Vec&lt;usize&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, ArrowError&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>reader = BufReader::new(reader);
-        <span class="comment">// check if header and footer contain correct magic bytes
-        </span><span class="kw">let </span><span class="kw-2">mut </span>magic_buffer: [u8; <span class="number">6</span>] = [<span class="number">0</span>; <span class="number">6</span>];
-        reader.read_exact(<span class="kw-2">&amp;mut </span>magic_buffer)<span class="question-mark">?</span>;
-        <span class="kw">if </span>magic_buffer != <span class="kw">super</span>::ARROW_MAGIC {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ParseError(
-                <span class="string">"Arrow file does not contain correct header"</span>.to_string(),
-            ));
-        }
-        reader.seek(SeekFrom::End(-<span class="number">6</span>))<span class="question-mark">?</span>;
-        reader.read_exact(<span class="kw-2">&amp;mut </span>magic_buffer)<span class="question-mark">?</span>;
-        <span class="kw">if </span>magic_buffer != <span class="kw">super</span>::ARROW_MAGIC {
+    /// Returns errors if the file does not meet the Arrow Format footer requirements
+    </span><span class="kw">pub fn </span>try_new(<span class="kw-2">mut </span>reader: R, projection: <span class="prelude-ty">Option</span>&lt;Vec&lt;usize&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, ArrowError&gt; {
+        <span class="comment">// Space for ARROW_MAGIC (6 bytes) and length (4 bytes)
+        </span><span class="kw">let </span><span class="kw-2">mut </span>buffer = [<span class="number">0</span>; <span class="number">10</span>];
+        reader.seek(SeekFrom::End(-<span class="number">10</span>))<span class="question-mark">?</span>;
+        reader.read_exact(<span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
+
+        <span class="kw">if </span>buffer[<span class="number">4</span>..] != <span class="kw">super</span>::ARROW_MAGIC {
             <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ParseError(
                 <span class="string">"Arrow file does not contain correct footer"</span>.to_string(),
             ));
         }
+
         <span class="comment">// read footer length
-        </span><span class="kw">let </span><span class="kw-2">mut </span>footer_size: [u8; <span class="number">4</span>] = [<span class="number">0</span>; <span class="number">4</span>];
-        reader.seek(SeekFrom::End(-<span class="number">10</span>))<span class="question-mark">?</span>;
-        reader.read_exact(<span class="kw-2">&amp;mut </span>footer_size)<span class="question-mark">?</span>;
-        <span class="kw">let </span>footer_len = i32::from_le_bytes(footer_size);
+        </span><span class="kw">let </span>footer_len = i32::from_le_bytes(buffer[..<span class="number">4</span>].try_into().unwrap());
 
         <span class="comment">// read footer
         </span><span class="kw">let </span><span class="kw-2">mut </span>footer_data = <span class="macro">vec!</span>[<span class="number">0</span>; footer_len <span class="kw">as </span>usize];
@@ -2257,35 +2246,14 @@
         </span><span class="kw">let </span><span class="kw-2">mut </span>dictionaries_by_id = HashMap::new();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(dictionaries) = footer.dictionaries() {
             <span class="kw">for </span>block <span class="kw">in </span>dictionaries {
-                <span class="comment">// read length from end of offset
-                </span><span class="kw">let </span><span class="kw-2">mut </span>message_size: [u8; <span class="number">4</span>] = [<span class="number">0</span>; <span class="number">4</span>];
-                reader.seek(SeekFrom::Start(block.offset() <span class="kw">as </span>u64))<span class="question-mark">?</span>;
-                reader.read_exact(<span class="kw-2">&amp;mut </span>message_size)<span class="question-mark">?</span>;
-                <span class="kw">if </span>message_size == CONTINUATION_MARKER {
-                    reader.read_exact(<span class="kw-2">&amp;mut </span>message_size)<span class="question-mark">?</span>;
-                }
-                <span class="kw">let </span>footer_len = i32::from_le_bytes(message_size);
-                <span class="kw">let </span><span class="kw-2">mut </span>block_data = <span class="macro">vec!</span>[<span class="number">0</span>; footer_len <span class="kw">as </span>usize];
-
-                reader.read_exact(<span class="kw-2">&amp;mut </span>block_data)<span class="question-mark">?</span>;
-
-                <span class="kw">let </span>message = <span class="kw">crate</span>::root_as_message(<span class="kw-2">&amp;</span>block_data[..]).map_err(|err| {
-                    ArrowError::ParseError(<span class="macro">format!</span>(<span class="string">"Unable to get root as message: {err:?}"</span>))
-                })<span class="question-mark">?</span>;
+                <span class="kw">let </span>buf = read_block(<span class="kw-2">&amp;mut </span>reader, block)<span class="question-mark">?</span>;
+                <span class="kw">let </span>message = parse_message(<span class="kw-2">&amp;</span>buf)<span class="question-mark">?</span>;
 
                 <span class="kw">match </span>message.header_type() {
                     <span class="kw">crate</span>::MessageHeader::DictionaryBatch =&gt; {
                         <span class="kw">let </span>batch = message.header_as_dictionary_batch().unwrap();
-
-                        <span class="comment">// read the block that makes up the dictionary batch into a buffer
-                        </span><span class="kw">let </span><span class="kw-2">mut </span>buf = MutableBuffer::from_len_zeroed(message.bodyLength() <span class="kw">as </span>usize);
-                        reader.seek(SeekFrom::Start(
-                            block.offset() <span class="kw">as </span>u64 + block.metaDataLength() <span class="kw">as </span>u64,
-                        ))<span class="question-mark">?</span>;
-                        reader.read_exact(<span class="kw-2">&amp;mut </span>buf)<span class="question-mark">?</span>;
-
                         read_dictionary(
-                            <span class="kw-2">&amp;</span>buf.into(),
+                            <span class="kw-2">&amp;</span>buf.slice(block.metaDataLength() <span class="kw">as _</span>),
                             batch,
                             <span class="kw-2">&amp;</span>schema,
                             <span class="kw-2">&amp;mut </span>dictionaries_by_id,
@@ -2352,27 +2320,15 @@
     }
 
     <span class="kw">fn </span>maybe_next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;RecordBatch&gt;, ArrowError&gt; {
-        <span class="kw">let </span>block = <span class="self">self</span>.blocks[<span class="self">self</span>.current_block];
+        <span class="kw">let </span>block = <span class="kw-2">&amp;</span><span class="self">self</span>.blocks[<span class="self">self</span>.current_block];
         <span class="self">self</span>.current_block += <span class="number">1</span>;
 
         <span class="comment">// read length
-        </span><span class="self">self</span>.reader.seek(SeekFrom::Start(block.offset() <span class="kw">as </span>u64))<span class="question-mark">?</span>;
-        <span class="kw">let </span><span class="kw-2">mut </span>meta_buf = [<span class="number">0</span>; <span class="number">4</span>];
-        <span class="self">self</span>.reader.read_exact(<span class="kw-2">&amp;mut </span>meta_buf)<span class="question-mark">?</span>;
-        <span class="kw">if </span>meta_buf == CONTINUATION_MARKER {
-            <span class="comment">// continuation marker encountered, read message next
-            </span><span class="self">self</span>.reader.read_exact(<span class="kw-2">&amp;mut </span>meta_buf)<span class="question-mark">?</span>;
-        }
-        <span class="kw">let </span>meta_len = i32::from_le_bytes(meta_buf);
-
-        <span class="kw">let </span><span class="kw-2">mut </span>block_data = <span class="macro">vec!</span>[<span class="number">0</span>; meta_len <span class="kw">as </span>usize];
-        <span class="self">self</span>.reader.read_exact(<span class="kw-2">&amp;mut </span>block_data)<span class="question-mark">?</span>;
-        <span class="kw">let </span>message = <span class="kw">crate</span>::root_as_message(<span class="kw-2">&amp;</span>block_data[..]).map_err(|err| {
-            ArrowError::ParseError(<span class="macro">format!</span>(<span class="string">"Unable to get root as footer: {err:?}"</span>))
-        })<span class="question-mark">?</span>;
+        </span><span class="kw">let </span>buffer = read_block(<span class="kw-2">&amp;mut </span><span class="self">self</span>.reader, block)<span class="question-mark">?</span>;
+        <span class="kw">let </span>message = parse_message(<span class="kw-2">&amp;</span>buffer)<span class="question-mark">?</span>;
 
         <span class="comment">// some old test data's footer metadata is not set, so we account for that
-        </span><span class="kw">if </span><span class="self">self</span>.metadata_version != <span class="kw">crate</span>::MetadataVersion::V1
+        </span><span class="kw">if </span><span class="self">self</span>.metadata_version != MetadataVersion::V1
             &amp;&amp; message.version() != <span class="self">self</span>.metadata_version
         {
             <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::IpcError(
@@ -2389,14 +2345,8 @@
                     ArrowError::IpcError(<span class="string">"Unable to read IPC message as record batch"</span>.to_string())
                 })<span class="question-mark">?</span>;
                 <span class="comment">// read the block that makes up the record batch into a buffer
-                </span><span class="kw">let </span><span class="kw-2">mut </span>buf = MutableBuffer::from_len_zeroed(message.bodyLength() <span class="kw">as </span>usize);
-                <span class="self">self</span>.reader.seek(SeekFrom::Start(
-                    block.offset() <span class="kw">as </span>u64 + block.metaDataLength() <span class="kw">as </span>u64,
-                ))<span class="question-mark">?</span>;
-                <span class="self">self</span>.reader.read_exact(<span class="kw-2">&amp;mut </span>buf)<span class="question-mark">?</span>;
-
-                read_record_batch(
-                    <span class="kw-2">&amp;</span>buf.into(),
+                </span>read_record_batch(
+                    <span class="kw-2">&amp;</span>buffer.slice(block.metaDataLength() <span class="kw">as _</span>),
                     batch,
                     <span class="self">self</span>.schema(),
                     <span class="kw-2">&amp;</span><span class="self">self</span>.dictionaries_by_id,
@@ -2416,14 +2366,14 @@
     ///
     /// It is inadvisable to directly read from the underlying reader.
     </span><span class="kw">pub fn </span>get_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>R {
-        <span class="self">self</span>.reader.get_ref()
+        <span class="kw-2">&amp;</span><span class="self">self</span>.reader
     }
 
     <span class="doccomment">/// Gets a mutable reference to the underlying reader.
     ///
     /// It is inadvisable to directly read from the underlying reader.
     </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>R {
-        <span class="self">self</span>.reader.get_mut()
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.reader
     }
 }
 

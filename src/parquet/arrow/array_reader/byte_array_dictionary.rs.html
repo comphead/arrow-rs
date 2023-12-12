@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/arrow/array_reader/byte_array_dictionary.rs`."><title>byte_array_dictionary.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (1fdfe1234 2023-12-06)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `parquet/src/arrow/array_reader/byte_array_dictionary.rs`."><title>byte_array_dictionary.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e883e87179a81222.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="parquet" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (21cce21d8 2023-12-11)" data-channel="nightly" data-search-js="search-2da88d4fc6a75ee8.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../../static.files/storage-bc37acceda91d44a.js"></script><script defer src="../../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../../src-files.js"></script><script defer src="../../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -667,19 +667,6 @@
 <a href="#667" id="667">667</a>
 <a href="#668" id="668">668</a>
 <a href="#669" id="669">669</a>
-<a href="#670" id="670">670</a>
-<a href="#671" id="671">671</a>
-<a href="#672" id="672">672</a>
-<a href="#673" id="673">673</a>
-<a href="#674" id="674">674</a>
-<a href="#675" id="675">675</a>
-<a href="#676" id="676">676</a>
-<a href="#677" id="677">677</a>
-<a href="#678" id="678">678</a>
-<a href="#679" id="679">679</a>
-<a href="#680" id="680">680</a>
-<a href="#681" id="681">681</a>
-<a href="#682" id="682">682</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -709,10 +696,8 @@
 
 <span class="kw">use </span><span class="kw">crate</span>::arrow::array_reader::byte_array::{ByteArrayDecoder, ByteArrayDecoderPlain};
 <span class="kw">use </span><span class="kw">crate</span>::arrow::array_reader::{read_records, skip_records, ArrayReader};
-<span class="kw">use </span><span class="kw">crate</span>::arrow::buffer::{
-    dictionary_buffer::DictionaryBuffer, offset_buffer::OffsetBuffer,
-};
-<span class="kw">use </span><span class="kw">crate</span>::arrow::record_reader::buffer::{BufferQueue, ScalarValue};
+<span class="kw">use </span><span class="kw">crate</span>::arrow::buffer::{dictionary_buffer::DictionaryBuffer, offset_buffer::OffsetBuffer};
+<span class="kw">use </span><span class="kw">crate</span>::arrow::record_reader::buffer::BufferQueue;
 <span class="kw">use </span><span class="kw">crate</span>::arrow::record_reader::GenericRecordReader;
 <span class="kw">use </span><span class="kw">crate</span>::arrow::schema::parquet_to_arrow_field;
 <span class="kw">use </span><span class="kw">crate</span>::basic::{ConvertedType, Encoding};
@@ -805,7 +790,7 @@
 <span class="doccomment">/// An [`ArrayReader`] for dictionary encoded variable length byte arrays
 ///
 /// Will attempt to preserve any dictionary encoding present in the parquet data
-</span><span class="kw">struct </span>ByteArrayDictionaryReader&lt;K: ScalarValue, V: ScalarValue&gt; {
+</span><span class="kw">struct </span>ByteArrayDictionaryReader&lt;K: ArrowNativeType, V: OffsetSizeTrait&gt; {
     data_type: ArrowType,
     pages: Box&lt;<span class="kw">dyn </span>PageIterator&gt;,
     def_levels_buffer: <span class="prelude-ty">Option</span>&lt;Buffer&gt;,
@@ -815,16 +800,13 @@
 
 <span class="kw">impl</span>&lt;K, V&gt; ByteArrayDictionaryReader&lt;K, V&gt;
 <span class="kw">where
-    </span>K: FromBytes + ScalarValue + Ord + ArrowNativeType,
-    V: ScalarValue + OffsetSizeTrait,
+    </span>K: FromBytes + Ord + ArrowNativeType,
+    V: OffsetSizeTrait,
 {
     <span class="kw">fn </span>new(
         pages: Box&lt;<span class="kw">dyn </span>PageIterator&gt;,
         data_type: ArrowType,
-        record_reader: GenericRecordReader&lt;
-            DictionaryBuffer&lt;K, V&gt;,
-            DictionaryDecoder&lt;K, V&gt;,
-        &gt;,
+        record_reader: GenericRecordReader&lt;DictionaryBuffer&lt;K, V&gt;, DictionaryDecoder&lt;K, V&gt;&gt;,
     ) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             data_type,
@@ -838,8 +820,8 @@
 
 <span class="kw">impl</span>&lt;K, V&gt; ArrayReader <span class="kw">for </span>ByteArrayDictionaryReader&lt;K, V&gt;
 <span class="kw">where
-    </span>K: FromBytes + ScalarValue + Ord + ArrowNativeType,
-    V: ScalarValue + OffsetSizeTrait,
+    </span>K: FromBytes + Ord + ArrowNativeType,
+    V: OffsetSizeTrait,
 {
     <span class="kw">fn </span>as_any(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn </span>Any {
         <span class="self">self
@@ -908,16 +890,15 @@
 
 <span class="kw">impl</span>&lt;K, V&gt; ColumnValueDecoder <span class="kw">for </span>DictionaryDecoder&lt;K, V&gt;
 <span class="kw">where
-    </span>K: FromBytes + ScalarValue + Ord + ArrowNativeType,
-    V: ScalarValue + OffsetSizeTrait,
+    </span>K: FromBytes + Ord + ArrowNativeType,
+    V: OffsetSizeTrait,
 {
     <span class="kw">type </span>Slice = DictionaryBuffer&lt;K, V&gt;;
 
     <span class="kw">fn </span>new(col: <span class="kw-2">&amp;</span>ColumnDescPtr) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>validate_utf8 = col.converted_type() == ConvertedType::UTF8;
 
-        <span class="kw">let </span>value_type = <span class="kw">match </span>(V::IS_LARGE, col.converted_type() == ConvertedType::UTF8)
-        {
+        <span class="kw">let </span>value_type = <span class="kw">match </span>(V::IS_LARGE, col.converted_type() == ConvertedType::UTF8) {
             (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; ArrowType::LargeUtf8,
             (<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; ArrowType::LargeBinary,
             (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; ArrowType::Utf8,
@@ -956,8 +937,7 @@
 
         <span class="kw">let </span>len = num_values <span class="kw">as </span>usize;
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = OffsetBuffer::&lt;V&gt;::default();
-        <span class="kw">let </span><span class="kw-2">mut </span>decoder =
-            ByteArrayDecoderPlain::new(buf, len, <span class="prelude-val">Some</span>(len), <span class="self">self</span>.validate_utf8);
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder = ByteArrayDecoderPlain::new(buf, len, <span class="prelude-val">Some</span>(len), <span class="self">self</span>.validate_utf8);
         decoder.read(<span class="kw-2">&amp;mut </span>buffer, usize::MAX)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>array = buffer.into_array(<span class="prelude-val">None</span>, <span class="self">self</span>.value_type.clone());
@@ -1021,8 +1001,8 @@
                     <span class="prelude-val">Some</span>(keys) =&gt; {
                         <span class="comment">// Happy path - can just copy keys
                         // Keys will be validated on conversion to arrow
-                        </span><span class="kw">let </span>keys_slice = keys.spare_capacity_mut(range.start + len);
-                        <span class="kw">let </span>len = decoder.get_batch(<span class="kw-2">&amp;mut </span>keys_slice[range.start..])<span class="question-mark">?</span>;
+                        </span><span class="kw">let </span>keys_slice = keys.get_output_slice(len);
+                        <span class="kw">let </span>len = decoder.get_batch(keys_slice)<span class="question-mark">?</span>;
                         <span class="kw-2">*</span>max_remaining_values -= len;
                         <span class="prelude-val">Ok</span>(len)
                     }
@@ -1042,11 +1022,7 @@
                         <span class="kw">let </span>dict_offsets = dict_buffers[<span class="number">0</span>].typed_data::&lt;V&gt;();
                         <span class="kw">let </span>dict_values = dict_buffers[<span class="number">1</span>].as_slice();
 
-                        values.extend_from_dictionary(
-                            <span class="kw-2">&amp;</span>keys[..len],
-                            dict_offsets,
-                            dict_values,
-                        )<span class="question-mark">?</span>;
+                        values.extend_from_dictionary(<span class="kw-2">&amp;</span>keys[..len], dict_offsets, dict_values)<span class="question-mark">?</span>;
                         <span class="kw-2">*</span>max_remaining_values -= len;
                         <span class="prelude-val">Ok</span>(len)
                     }
@@ -1057,9 +1033,7 @@
 
     <span class="kw">fn </span>skip_values(<span class="kw-2">&amp;mut </span><span class="self">self</span>, num_values: usize) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
         <span class="kw">match </span><span class="self">self</span>.decoder.as_mut().expect(<span class="string">"decoder set"</span>) {
-            MaybeDictionaryDecoder::Fallback(decoder) =&gt; {
-                decoder.skip::&lt;V&gt;(num_values, <span class="prelude-val">None</span>)
-            }
+            MaybeDictionaryDecoder::Fallback(decoder) =&gt; decoder.skip::&lt;V&gt;(num_values, <span class="prelude-val">None</span>),
             MaybeDictionaryDecoder::Dict {
                 decoder,
                 max_remaining_values,
